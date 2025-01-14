@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: DefaultSaveSettings
   m_EditorClassIdentifier: Assembly-CSharp::SaveSettings
-  FileFormat: 1
+  FileFormat: 0
+  FileFormatExtension: bin
   FolderName: Saves

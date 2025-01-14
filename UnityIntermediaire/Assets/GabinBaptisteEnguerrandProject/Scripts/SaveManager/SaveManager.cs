@@ -21,10 +21,9 @@ public static class SaveManager
         {
             FileName = filename;
             FileImage = fileImage;
-
+            
             DateTime dt = DateTime.Now;
             FileDate = dt.ToString("dd-MM-yyyy HH:mm:ss");
-
 
             Data = newData;
         }
@@ -32,7 +31,7 @@ public static class SaveManager
 
     private static string GetPath(string saveName) => Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
 
-    public static void SaveProgress(object dataToSave, string saveName = "Save", Image FileImage = null)
+    public static void SaveProgress(this object dataToSave, string saveName = "Save", Image FileImage = null)
     {
         //Create save file data & get save path
         string path = GetPath(saveName);
@@ -63,7 +62,26 @@ public static class SaveManager
 
     public static List<SaveFileData> GetEverySaveFileData()
     {
-        return new List<SaveFileData>();
+        List<SaveFileData> SaveFilesList = new List<SaveFileData>();
+        string folderPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
+
+        if (Directory.Exists(folderPath))
+        {
+            //Filter files by extension name
+            string[] filesFound = Directory.GetFiles(folderPath, "*." + SaveSettingsManager.GetFileFormatExtension());
+            foreach (string file in filesFound)
+            {
+                //Get file names and get save file data
+                string fileName = Path.GetFileName(file);
+                SaveFilesList.Add(GetSaveFileData(fileName));
+            }
+        }
+        else
+        {
+            Debug.LogError("Can't find folder in " + folderPath);
+        }
+
+        return SaveFilesList;
     }
 
     public static SaveFileData GetSaveFileData(string saveName = "Save")

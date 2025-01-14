@@ -33,7 +33,7 @@ public static class SaveSettingsManager
                 return SaveSettings.Instance.FileFormatExtension;
 
             case FileFormats.JSON:
-                return "Json";
+                return "json";
         }
 
         return "";
