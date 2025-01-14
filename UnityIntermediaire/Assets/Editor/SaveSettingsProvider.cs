@@ -4,29 +4,28 @@ using UnityEditor;
 using UnityEngine;
 using static SaveManager;
 
-[CreateAssetMenu(fileName = "SaveSettings", menuName = "Settings/Save Settings")]
-public class CustomSettings : ScriptableObject
+public class SaveSettingsProvider : SettingsProvider
 {
-    public FileFormats FileFormat;
-    public string FolderName;
-}
+    private const string Path = "Project/Save Settings";
+    private static SaveSettings settings;
 
-public class CustomSettingsProvider : SettingsProvider
-{
-    private const string Path = "Project/Custom Settings";
-    private static CustomSettings settings;
+    public SaveSettingsProvider(string path, SettingsScope scope) : base(path, scope) { }
 
-    public CustomSettingsProvider(string path, SettingsScope scope) : base(path, scope) { }
-
-    public static CustomSettings GetOrCreateSettings()
+    public static SaveSettings GetOrCreateSettings()
     {
+        //Get current save settings if not already
         if (settings == null)
         {
-            settings = AssetDatabase.LoadAssetAtPath<CustomSettings>("Assets/GabinBaptisteEnguerrandProject/DefaultSaveSettings.asset");
+            settings = AssetDatabase.LoadAssetAtPath<SaveSettings>("Assets/GabinBaptisteEnguerrandProject/Scripts/SaveManager/DefaultSaveSettings.asset");
             if (settings == null)
             {
-                settings = ScriptableObject.CreateInstance<CustomSettings>();
-                AssetDatabase.CreateAsset(settings, "Assets/GabinBaptisteEnguerrandProject/DefaultSaveSettings.asset");
+                //Create Save settings if doesn't exists
+                settings = ScriptableObject.CreateInstance<SaveSettings>();
+                AssetDatabase.CreateAsset(settings, "Assets/GabinBaptisteEnguerrandProject/Scripts/SaveManager/DefaultSaveSettings.asset");
+
+                //Create Instance reference
+                SaveSettings.Instance = settings;
+
                 AssetDatabase.SaveAssets();
             }
         }
@@ -37,8 +36,14 @@ public class CustomSettingsProvider : SettingsProvider
     {
         settings = GetOrCreateSettings();
 
+        //Create Editor Settings
         EditorGUILayout.LabelField("Save Settings", EditorStyles.boldLabel);
         settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);
+        
+        //Show binary extension if binary format is selected
+        if(settings.FileFormat == FileFormats.BINARY)
+            settings.FileFormatExtension = EditorGUILayout.TextField("File Extension :", settings.FileFormatExtension);
+        
         settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
 
         if (GUI.changed)
@@ -50,6 +55,6 @@ public class CustomSettingsProvider : SettingsProvider
     [SettingsProvider]
     public static SettingsProvider CreateCustomSettingsProvider()
     {
-        return new CustomSettingsProvider(Path, SettingsScope.Project);
+        return new SaveSettingsProvider(Path, SettingsScope.Project);
     }
 }

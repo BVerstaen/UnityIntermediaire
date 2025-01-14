@@ -30,19 +30,35 @@ public static class SaveManager
         }
     }
 
-    public static void SaveProgress(object dataToSave, string saveName = "Save", string fileName = "Save", Image FileImage = null)
+    private static string GetPath(string saveName) => Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
+
+    public static void SaveProgress(object dataToSave, string saveName = "Save", Image FileImage = null)
     {
-        BinaryFormatter formatter = new BinaryFormatter();
-        string path = Application.persistentDataPath + "/" + "Saves" + "/" + saveName + ".save";
-        FileStream stream = new FileStream(path, FileMode.Create);
+        //Create save file data & get save path
+        string path = GetPath(saveName);
+        SaveFileData SaveFile = new SaveFileData(dataToSave, saveName, FileImage);
 
-        SaveFileData SaveFile = new SaveFileData(dataToSave, fileName, FileImage);
+        switch (SaveSettingsManager.GetFileFormat())
+        {
+            //Save to .JSON
+            case FileFormats.JSON:
+                string SaveDataJSON = JsonUtility.ToJson(SaveFile);
+                File.WriteAllText(path, SaveDataJSON);
+                break;
 
-        formatter.Serialize(stream, SaveFile);
+            //Save to Binary file
+            case FileFormats.BINARY:
+                BinaryFormatter formatter = new BinaryFormatter();
+                FileStream stream = new FileStream(path, FileMode.Create);
 
-        stream.Close();
-        
-        Debug.LogFormat("Save Complete !");
+                formatter.Serialize(stream, SaveFile);
+
+                stream.Close();
+
+                Debug.Log("Save Complete !");
+                break;
+        }
+
     }
 
     public static List<SaveFileData> GetEverySaveFileData()
@@ -50,18 +66,34 @@ public static class SaveManager
         return new List<SaveFileData>();
     }
 
-    public static SaveFileData GetSaveFileData(string saveName)
+    public static SaveFileData GetSaveFileData(string saveName = "Save")
     {
-        string path = Application.persistentDataPath + "/" + "Saves" + "/" + saveName + ".save";
+        string path = GetPath(saveName);
         if (File.Exists(path))
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
+            SaveFileData dataToLoad = null;
 
-            SaveFileData dataToLoad = formatter.Deserialize(stream) as SaveFileData;
-            stream.Close();
+            switch (SaveSettingsManager.GetFileFormat())
+            {
+                //Load SaveFileData from .JSON
+                case FileFormats.JSON:
+                    string SaveDataJSON = File.ReadAllText(path);
+                    dataToLoad = JsonUtility.FromJson<SaveFileData>(SaveDataJSON);
+                    break;
 
-            Debug.LogFormat("Load Complete !");
+                //Load SaveFileData from Binary file
+                case FileFormats.BINARY:
+                    //Load data & get save files
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    FileStream stream = new FileStream(path, FileMode.Open);
+
+                    dataToLoad = formatter.Deserialize(stream) as SaveFileData;
+                    stream.Close();
+
+                    Debug.Log("Fetch data Complete !");
+                    break;
+            }
+
             return dataToLoad;
         }
         else
@@ -71,31 +103,25 @@ public static class SaveManager
         }
     }
 
-    public static object LoadData()
+    public static object LoadData(string saveName = "Save")
     {
-        string path = Application.persistentDataPath + "/SaveData.save";
-        if (File.Exists(path))
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
-
-            SaveFileData dataToLoad = formatter.Deserialize(stream) as SaveFileData;
-            stream.Close();
-
-            Debug.LogFormat("Load Complete !");
+        SaveFileData dataToLoad = GetSaveFileData(saveName);
+        if (dataToLoad != null)
             return dataToLoad.Data;
-        }
         else
         {
-            Debug.LogError("Save file not found in " + path);
+            Debug.LogError("Can't load save file !");
             return null;
         }
 
     }
 
-    public static void DeleteSave(string fileName = "Save")
+    public static void DeleteSave(string saveName = "Save")
     {
-        string path = Application.persistentDataPath + "/SaveData.save";
-
+        string path = GetPath(saveName);
+        if (File.Exists(path))
+            File.Delete(path);
+        else
+            Debug.LogError("Save file can't be found in " + path);
     }
 }
