@@ -12,18 +12,18 @@ public static class SaveManager
     public class SaveFileData
     {
         public string FileName;
-        public Image FileImage;
+        public Sprite FileImage;
         public string FileDate;
 
         public object Data;
 
-        public SaveFileData(object newData, string filename, Image fileImage)
+        public SaveFileData(object newData, string filename, Sprite fileImage)
         {
             FileName = filename;
             FileImage = fileImage;
             
             DateTime dt = DateTime.Now;
-            FileDate = dt.ToString("dd-MM-yyyy HH:mm:ss");
+            FileDate = dt.ToString("dd/MM/yyyy - HH:mm:ss");
 
             Data = newData;
         }
@@ -31,14 +31,14 @@ public static class SaveManager
 
     private static string GetPath(string saveName) => Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
 
-    public static void SaveProgress(this object dataToSave, string saveName = "Save", Image FileImage = null)
+    public static void SaveData(this object dataToSave, string saveName = "Save", Sprite FileImage = null)
     {
         //Create save file data & get save path
         string path = GetPath(saveName);
         SaveFileData SaveFile = new SaveFileData(dataToSave, saveName, FileImage);
 
         switch (SaveSettingsManager.GetFileFormat())
-        {
+        { 
             //Save to .JSON
             case FileFormats.JSON:
                 string SaveDataJSON = JsonUtility.ToJson(SaveFile);
@@ -51,7 +51,7 @@ public static class SaveManager
                 FileStream stream = new FileStream(path, FileMode.Create);
 
                 formatter.Serialize(stream, SaveFile);
-
+                
                 stream.Close();
 
                 Debug.Log("Save Complete !");
@@ -80,7 +80,7 @@ public static class SaveManager
         {
             Debug.LogError("Can't find folder in " + folderPath);
         }
-
+        
         return SaveFilesList;
     }
 
