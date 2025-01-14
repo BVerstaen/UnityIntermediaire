@@ -4,25 +4,16 @@ using UnityEditor;
 using UnityEngine;
 using static SaveManager;
 
-public class SaveSettings : ScriptableObject
-{
-    public static SaveSettings Instance;
-
-    public FileFormats FileFormat = FileFormats.BINARY;
-    public string FileFormatExtension = "bin";
-    public string FolderName = "Saves";
-}
-
 public static class SaveSettingsManager
 {
     public static string GetFolderName()
     {
-        return SaveSettings.Instance.FolderName;
+        return GetCurrentSavesSettings().FolderName;
     }
 
     public static FileFormats GetFileFormat()
     {
-        return SaveSettings.Instance.FileFormat;
+        return GetCurrentSavesSettings().FileFormat;
     }
 
     public static string GetFileFormatExtension()
@@ -30,12 +21,22 @@ public static class SaveSettingsManager
         switch (GetFileFormat())
         {
             case FileFormats.BINARY:
-                return SaveSettings.Instance.FileFormatExtension;
+                return GetCurrentSavesSettings().FileFormatExtension;
 
             case FileFormats.JSON:
                 return "json";
         }
 
         return "";
+    }
+
+    private static SaveSettings GetCurrentSavesSettings()
+    {
+        if (SaveSettings.Instance == null)
+        {
+            SaveSettings currentSaveSettings = AssetDatabase.LoadAssetAtPath<SaveSettings>("Assets/GabinBaptisteEnguerrandProject/Scripts/SaveManager/DefaultSaveSettings.asset");
+            SaveSettings.Instance = currentSaveSettings;
+        }
+        return SaveSettings.Instance;
     }
 }

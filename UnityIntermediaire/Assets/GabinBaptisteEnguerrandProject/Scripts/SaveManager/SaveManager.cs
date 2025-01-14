@@ -2,17 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 
 public static class SaveManager
 {
     public enum FileFormats { JSON, BINARY }
 
+    [System.Serializable]
     public class SaveFileData
     {
         public string FileName;
-        public Sprite FileImage;
+        public string FileImagePath;
         public string FileDate;
 
         public object Data;
@@ -20,7 +21,7 @@ public static class SaveManager
         public SaveFileData(object newData, string filename, Sprite fileImage)
         {
             FileName = filename;
-            FileImage = fileImage;
+            FileImagePath = AssetDatabase.GetAssetPath(fileImage.GetInstanceID());
             
             DateTime dt = DateTime.Now;
             FileDate = dt.ToString("dd/MM/yyyy - HH:mm:ss");
@@ -29,13 +30,23 @@ public static class SaveManager
         }
     }
 
-    private static string GetPath(string saveName) => Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
+    private static string GetPath(string saveName, bool withExtension = true)
+    {
+        return Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + (withExtension ? "." + SaveSettingsManager.GetFileFormatExtension() : "");
+    }
 
-    public static void SaveData(this object dataToSave, string saveName = "Save", Sprite FileImage = null)
+    public static void SaveData(object dataToSave, string saveName, Sprite FileImage = null)
     {
         //Create save file data & get save path
         string path = GetPath(saveName);
         SaveFileData SaveFile = new SaveFileData(dataToSave, saveName, FileImage);
+
+        //Create save foldier if doesn't exist
+        string directoryPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
 
         switch (SaveSettingsManager.GetFileFormat())
         { 
@@ -60,7 +71,7 @@ public static class SaveManager
 
     }
 
-    public static List<SaveFileData> GetEverySaveFileData()
+    public static List<SaveFileData> GetEverySaveFile()
     {
         List<SaveFileData> SaveFilesList = new List<SaveFileData>();
         string folderPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
@@ -84,9 +95,10 @@ public static class SaveManager
         return SaveFilesList;
     }
 
-    public static SaveFileData GetSaveFileData(string saveName = "Save")
+    public static SaveFileData GetSaveFileData(string saveName)
     {
-        string path = GetPath(saveName);
+        string path = GetPath(saveName, false);
+
         if (File.Exists(path))
         {
             SaveFileData dataToLoad = null;
@@ -121,7 +133,7 @@ public static class SaveManager
         }
     }
 
-    public static object LoadData(string saveName = "Save")
+    public static object LoadData(string saveName)
     {
         SaveFileData dataToLoad = GetSaveFileData(saveName);
         if (dataToLoad != null)
@@ -134,7 +146,7 @@ public static class SaveManager
 
     }
 
-    public static void DeleteSave(string saveName = "Save")
+    public static void DeleteSave(string saveName)
     {
         string path = GetPath(saveName);
         if (File.Exists(path))

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static SaveManager;
@@ -15,23 +16,31 @@ public class SavePanel : MonoBehaviour
     [Header("Parameters")]
     [SerializeField] bool _showDeleteButton;
 
+    [SerializeField] List<GameObject> _objectsActivatedWhenSelected;
+
     private string _saveName;
+
+    public string SaveName { get => _saveName; private set => _saveName = value; }
 
     private void Awake()
     {
-        _deleteButton.enabled = _showDeleteButton;
+        if(_deleteButton != null)
+            _deleteButton.enabled = _showDeleteButton;
     }
 
     public void LoadDataFromSaveFile(SaveFileData saveFile)
     {
-        _saveNameText.text = saveFile.FileName;
+        if(_saveNameText != null)
+            _saveNameText.text = saveFile.FileName;
+
         _saveName = saveFile.FileName;
 
-        _dateText.text = saveFile.FileDate;
+        if(_dateText != null)
+            _dateText.text = saveFile.FileDate;
 
-        if(saveFile.FileImage != null)
+        if(saveFile.FileImagePath != string.Empty && _saveImg != null)
         {
-            _saveImg.sprite = saveFile.FileImage;
+            _saveImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(saveFile.FileImagePath);
             _saveImg.enabled = true;
         }
         else
@@ -44,5 +53,13 @@ public class SavePanel : MonoBehaviour
     {
         SaveManager.DeleteSave(_saveName);
         Destroy(gameObject);
+    }
+
+    public void SelectedEffect(bool activate)
+    {
+        foreach(GameObject objectActivated in _objectsActivatedWhenSelected)
+        {
+            objectActivated.SetActive(activate);
+        }
     }
 }

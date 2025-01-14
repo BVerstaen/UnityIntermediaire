@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: b7fcb6556c0d4524883c71ea225a8436, type: 3}
   m_Name: DefaultSaveSettings
-  m_EditorClassIdentifier: Assembly-CSharp::SaveSettings
+  m_EditorClassIdentifier: 
   FileFormat: 0
   FileFormatExtension: bin
   FolderName: Saves
