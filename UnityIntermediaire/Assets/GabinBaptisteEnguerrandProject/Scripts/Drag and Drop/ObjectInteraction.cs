@@ -52,7 +52,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         switch (mode)
         {
             case _mode.Game:
-                if (_isDragable && )
+                if (_isDragable)
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 break;
             case _mode.UI:
