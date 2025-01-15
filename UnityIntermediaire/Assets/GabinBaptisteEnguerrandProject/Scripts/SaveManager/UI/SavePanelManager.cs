@@ -25,14 +25,14 @@ public class SavePanelManager : MonoBehaviour
     [Header("References")]
     [SerializeField] GameObject _savePanelPrefab;
 
-    [Header("Save Parameters")]
+    [Header("Save parameters")]
     [SerializeField] int _maxNumberOfSaves;
     [SerializeField] PanelImageType _panelImage;
     [SerializeField] Sprite _defaultPanelImage;
     [SerializeField] List<Sprite> _listOfPanelImages;
 
 
-    [Header("Panel Parameters")]
+    [Header("Panel placments parameters")]
     [SerializeField] Transform _savePanelFirstPosition;
     [Space(5)]
     [SerializeField] float _spaceBetweenTwoSavePanels;
@@ -183,25 +183,28 @@ public class SavePanelManager : MonoBehaviour
         
         string _savedata = JsonUtility.ToJson(_saveObject);
 
-        Sprite savePanelImage = null;
+        Texture2D savePanelImage = null;
+        bool takeScreenShot = false;
         switch (_panelImage)
         {
             case PanelImageType.None:
                 break;
             
             case PanelImageType.SimpleImage:
-                savePanelImage = _defaultPanelImage;
+                savePanelImage = _defaultPanelImage.texture;
                 break;
 
             case PanelImageType.RandomImage:
-                savePanelImage = _listOfPanelImages[UnityEngine.Random.Range(0, _listOfPanelImages.Count)];
+                savePanelImage = _listOfPanelImages[UnityEngine.Random.Range(0, _listOfPanelImages.Count)].texture;
                 break;
 
-            //case PanelImageType.Screenshot:
+            case PanelImageType.Screenshot:
+                takeScreenShot = true;
+                break;
                 
         }
 
-        SaveManager.SaveData(_savedata, saveName, savePanelImage);
+        SaveManager.SaveData(_savedata, saveName, savePanelImage, takeScreenShot);
 
         RefreshAndCreateSavePanels();
     }

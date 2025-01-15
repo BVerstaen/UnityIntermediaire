@@ -3260,10 +3260,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 41858291}
     m_Modifications:
     - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
-      propertyPath: _panelImage
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: _saveObject
       value: 
       objectReference: {fileID: 292553132}
@@ -3271,6 +3267,22 @@ PrefabInstance:
       propertyPath: _saveNameField
       value: 
       objectReference: {fileID: 2076799527}
+    - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
+      propertyPath: _defaultPanelImage
+      value: 
+      objectReference: {fileID: 21300000, guid: 3c9e66d6b0401a64cb1e6ccd0464f878, type: 3}
+    - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
+      propertyPath: _listOfPanelImages.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
+      propertyPath: _listOfPanelImages.Array.data[0]
+      value: 
+      objectReference: {fileID: 21300000, guid: e41ce9e924d703146a15167b35b29e80, type: 3}
+    - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
+      propertyPath: _listOfPanelImages.Array.data[1]
+      value: 
+      objectReference: {fileID: 21300000, guid: ab81a407b9265704ba687b780f702699, type: 3}
     - target: {fileID: 5298979400350870092, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

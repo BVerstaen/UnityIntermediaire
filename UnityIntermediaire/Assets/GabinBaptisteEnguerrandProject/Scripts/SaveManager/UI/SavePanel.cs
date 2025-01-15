@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using static SaveManager;
@@ -50,14 +51,38 @@ public class SavePanel : MonoBehaviour
         if(_dateText != null)
             _dateText.text = saveFile.FileDate;
 
-        if (saveFile.FileImage != string.Empty && _saveImg != null)
+        if (saveFile.hasCorrespondingImage && _saveImg != null)
         {
-            _saveImg.sprite = Resources.Load<Sprite>("SaveManager\\" + saveFile.FileImage);
-            _saveImg.enabled = true;
+            string path = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveFile.FileName + ".png";
+            StartCoroutine(WaitAndApplyImageFile(path));
         }
         else
         {
             _saveImg.enabled = false;
+        }
+    }
+
+    //Wait until correspondingimage is loaded and apply it
+    IEnumerator WaitAndApplyImageFile(string path)
+    {
+        bool isImgLoaded = false;
+
+        while (!isImgLoaded) 
+        {
+            isImgLoaded = File.Exists(path);
+            yield return null;
+        }
+
+        byte[] imgData = File.ReadAllBytes(path);
+        Texture2D texture = new Texture2D(2, 2);
+        if (texture.LoadImage(imgData))
+        {
+            _saveImg.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(.5f, .5f));
+            _saveImg.enabled = true;
+        }
+        else
+        {
+            Debug.LogError("Can't load image data from Texture2D");
         }
     }
 
