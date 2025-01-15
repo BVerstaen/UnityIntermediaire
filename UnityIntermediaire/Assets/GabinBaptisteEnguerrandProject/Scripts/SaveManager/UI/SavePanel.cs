@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static SaveManager;
@@ -13,8 +12,11 @@ public class SavePanel : MonoBehaviour
     [SerializeField] Image _saveImg;
     [SerializeField] Button _deleteButton;
 
-    [Header("Parameters")]
-    [SerializeField] bool _showDeleteButton;
+    [Header("Custom UI")]
+    [SerializeField] bool _showNameText = true;
+    [SerializeField] bool _showDateText = true;
+    [SerializeField] bool _showImage = true;
+    [SerializeField] bool _showDeleteButton = true;
 
     [SerializeField] List<GameObject> _objectsActivatedWhenSelected;
 
@@ -24,11 +26,21 @@ public class SavePanel : MonoBehaviour
 
     private void Awake()
     {
+        //Show / Hide UI depending on choice
+        if (_saveNameText != null)
+            _saveNameText.enabled = _showNameText;
+
+        if(_dateText != null)
+            _dateText.enabled = _showDateText;
+
+        if(_saveImg != null)
+            _saveImg.enabled = _showImage;
+
         if(_deleteButton != null)
             _deleteButton.enabled = _showDeleteButton;
     }
 
-    public void LoadDataFromSaveFile(SaveFileData saveFile)
+    public void LoadDataFromSaveFile<T>(SaveFileData<T> saveFile)
     {
         if(_saveNameText != null)
             _saveNameText.text = saveFile.FileName;
@@ -38,9 +50,9 @@ public class SavePanel : MonoBehaviour
         if(_dateText != null)
             _dateText.text = saveFile.FileDate;
 
-        if(saveFile.FileImagePath != string.Empty && _saveImg != null)
+        if (saveFile.FileImage != string.Empty && _saveImg != null)
         {
-            _saveImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(saveFile.FileImagePath);
+            _saveImg.sprite = Resources.Load<Sprite>("SaveManager\\" + saveFile.FileImage);
             _saveImg.enabled = true;
         }
         else

@@ -1,25 +1,64 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class SavePanelManager : MonoBehaviour
 {
+    public enum PanelImageType
+    {
+        None = 0,
+        SimpleImage = 1,
+        RandomImage = 2,
+        Screenshot = 3
+    }
+    public enum ScrollRectDirection
+    {
+        Horizontal,
+        InvertedHorizontal,
+        Vertical,
+        InvertedVertical
+    }
+
+
     [Header("References")]
     [SerializeField] GameObject _savePanelPrefab;
-    [SerializeField] InputField _saveNameField;
+
+    [Header("Save Parameters")]
+    [SerializeField] int _maxNumberOfSaves;
+    [SerializeField] PanelImageType _panelImage;
+    [SerializeField] Sprite _defaultPanelImage;
+    [SerializeField] List<Sprite> _listOfPanelImages;
+
 
     [Header("Panel Parameters")]
     [SerializeField] Transform _savePanelFirstPosition;
-    [SerializeField] Sprite _savePanelImage;
+    [Space(5)]
     [SerializeField] float _spaceBetweenTwoSavePanels;
+    [SerializeField] ScrollRectDirection _panelScrollDirection;
+    private ScrollRect _panelScrollRect;
+
+    [Header("Input save name")]
+    [SerializeField] InputField _saveNameField;
+    [SerializeField] string _defaultSaveName;
+    [SerializeField] bool _shouldSaveNameAutoIncrement;
+
+    [Header("Unity Events")]
+    [SerializeField] UnityEvent _onMaxNumberOfSavesReached;
+
     
 
+    //Panel private fields
     List<SavePanel> _savePanels;
     SavePanel _selectedPanel;
-
     Vector2 _newPanelPosition;
+
+    private void OnValidate()
+    {
+        if(_maxNumberOfSaves <= 0)
+            _maxNumberOfSaves = 1;
+    }
 
     private void Start()
     {
@@ -30,7 +69,6 @@ public class SavePanelManager : MonoBehaviour
 
     public void RefreshAndCreateSavePanels()
     {
-
         //Remove old saves
         if(_savePanels.Count > 0)
         {
@@ -44,7 +82,13 @@ public class SavePanelManager : MonoBehaviour
         }
 
         //Get every saves
-        List<SaveManager.SaveFileData> saveFiles = SaveManager.GetEverySaveFile();
+        List<SaveManager.SaveFileData<string>> saveFiles = SaveManager.GetEverySaveFile<string>();
+
+        //Check if there's more save files than max number
+        if(saveFiles.Count > _maxNumberOfSaves)
+        {
+            Debug.LogWarning("There's more save files than maximumNumberOfSaves !");
+        }
 
         //Create corresponding save panels
         foreach (var file in saveFiles) 
@@ -54,7 +98,25 @@ public class SavePanelManager : MonoBehaviour
             GameObject newPanel = Instantiate(_savePanelPrefab, gameObject.transform);
             //Set new position
             newPanel.transform.localPosition = _newPanelPosition;
-            _newPanelPosition = new Vector2(_newPanelPosition.x + _spaceBetweenTwoSavePanels, _newPanelPosition.y);
+            switch (_panelScrollDirection)
+            {
+                case ScrollRectDirection.Horizontal:
+                    _newPanelPosition = new Vector2(_newPanelPosition.x + _spaceBetweenTwoSavePanels, _newPanelPosition.y);
+                    break;
+
+                case ScrollRectDirection.InvertedHorizontal:
+                    _newPanelPosition = new Vector2(_newPanelPosition.x - _spaceBetweenTwoSavePanels, _newPanelPosition.y);
+                    break;
+
+                case ScrollRectDirection.Vertical:
+                    _newPanelPosition = new Vector2(_newPanelPosition.x, _newPanelPosition.y - _spaceBetweenTwoSavePanels);
+                    break;
+
+                case ScrollRectDirection.InvertedVertical:
+                    _newPanelPosition = new Vector2(_newPanelPosition.x, _newPanelPosition.y + _spaceBetweenTwoSavePanels);
+                    break;
+            }
+            
 
             //Init saves
             SavePanel savePanelComponent = newPanel.GetComponent<SavePanel>();
@@ -72,6 +134,26 @@ public class SavePanelManager : MonoBehaviour
                 }
             }
         }
+
+        //Set panel scroll in function of panel scroll direction
+        _panelScrollRect = GetComponent<ScrollRect>();
+        if (_panelScrollRect != null)
+        {
+            switch (_panelScrollDirection)
+            {
+                case ScrollRectDirection.Horizontal:
+                case ScrollRectDirection.InvertedHorizontal:
+                    _panelScrollRect.horizontal = true;
+                    _panelScrollRect.vertical = false;
+                    break;
+
+                case ScrollRectDirection.Vertical:
+                case ScrollRectDirection.InvertedVertical:
+                    _panelScrollRect.horizontal = false;
+                    _panelScrollRect.vertical = true;
+                    break;
+            }
+        }
     }
 
     public void SelectSaveFile(SavePanel newSavePanel)
@@ -85,29 +167,51 @@ public class SavePanelManager : MonoBehaviour
     }
 
     //Buttons functions
-    public void CreateSave()
+    public void CreateSaveFromComponent(Component _saveObject)
     {
-        //TEMP Create false object to test saving
-        object newObject = new object();
+        //Check if reach maximum number of saves files
+        if(_maxNumberOfSaves <= _savePanels.Count)
+        {
+            Debug.LogWarning("Maximum number of saves reached !");
+            return;
+        }
 
         //Change save name if use save name field
-        string saveName = "Save";
+        string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
         if(_saveNameField != null)
             saveName = _saveNameField.text;
+        
+        string _savedata = JsonUtility.ToJson(_saveObject);
 
-        SaveManager.SaveData(newObject, saveName, _savePanelImage);
+        Sprite savePanelImage = null;
+        switch (_panelImage)
+        {
+            case PanelImageType.None:
+                break;
+            
+            case PanelImageType.SimpleImage:
+                savePanelImage = _defaultPanelImage;
+                break;
+
+            case PanelImageType.RandomImage:
+                savePanelImage = _listOfPanelImages[UnityEngine.Random.Range(0, _listOfPanelImages.Count)];
+                break;
+
+            //case PanelImageType.Screenshot:
+                
+        }
+
+        SaveManager.SaveData(_savedata, saveName, savePanelImage);
 
         RefreshAndCreateSavePanels();
     }
-
-    public void LoadSave()
+    
+    public void LoadSave<T>(object ObjectToSaveTo)
     {
-        if(_selectedPanel != null)
-        {
-            object LoadedSave = SaveManager.LoadData(_selectedPanel.SaveName);
-            Debug.Log(LoadedSave);
-        }
+        if (_selectedPanel == null) throw new Exception("Missing selected Panel");
 
+        string _loadedJson = SaveManager.LoadData<string>(_selectedPanel.SaveName);
+        JsonUtility.FromJsonOverwrite(_loadedJson, ObjectToSaveTo);
     }
 
     public void EraseSave()

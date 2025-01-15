@@ -86,10 +86,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _savePanelPrefab: {fileID: 4605454968339237317, guid: 51374337eaa9ad049ade300b6822e101, type: 3}
-  _saveNameField: {fileID: 0}
+  _maxNumberOfSaves: 3
+  _panelImage: 0
+  _defaultPanelImage: {fileID: 0}
+  _listOfPanelImages: []
   _savePanelFirstPosition: {fileID: 8558620974344710371}
-  _savePanelImage: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  _savePanelImage: {fileID: 21300000, guid: 3c9e66d6b0401a64cb1e6ccd0464f878, type: 3}
   _spaceBetweenTwoSavePanels: 450
+  _panelScrollDirection: 0
+  _saveNameField: {fileID: 0}
+  _defaultSaveName: 'Save - '
+  _shouldSaveNameAutoIncrement: 0
+  _onMaxNumberOfSavesReached:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8428164802339756835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -103,7 +113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Content: {fileID: 5298979400350870092}
-  m_Horizontal: 1
+  m_Horizontal: 0
   m_Vertical: 0
   m_MovementType: 1
   m_Elasticity: 1

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEditor;
 using UnityEngine;
 
 public static class SaveManager
@@ -10,18 +9,18 @@ public static class SaveManager
     public enum FileFormats { JSON, BINARY }
 
     [System.Serializable]
-    public class SaveFileData
+    public class SaveFileData<T>
     {
         public string FileName;
-        public string FileImagePath;
+        public string FileImage;
         public string FileDate;
 
-        public object Data;
+        public T Data;
 
-        public SaveFileData(object newData, string filename, Sprite fileImage)
+        public SaveFileData(T newData, string filename, Sprite fileImage)
         {
             FileName = filename;
-            FileImagePath = AssetDatabase.GetAssetPath(fileImage.GetInstanceID());
+            FileImage = fileImage.name;
             
             DateTime dt = DateTime.Now;
             FileDate = dt.ToString("dd/MM/yyyy - HH:mm:ss");
@@ -35,11 +34,11 @@ public static class SaveManager
         return Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + (withExtension ? "." + SaveSettingsManager.GetFileFormatExtension() : "");
     }
 
-    public static void SaveData(object dataToSave, string saveName, Sprite FileImage = null)
+    public static void SaveData<T>(T dataToSave, string saveName, Sprite FileImage = null)
     {
         //Create save file data & get save path
         string path = GetPath(saveName);
-        SaveFileData SaveFile = new SaveFileData(dataToSave, saveName, FileImage);
+        SaveFileData<T> SaveFile = new SaveFileData<T>(dataToSave, saveName, FileImage);
 
         //Create save foldier if doesn't exist
         string directoryPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
@@ -71,9 +70,9 @@ public static class SaveManager
 
     }
 
-    public static List<SaveFileData> GetEverySaveFile()
+    public static List<SaveFileData<T>> GetEverySaveFile<T>()
     {
-        List<SaveFileData> SaveFilesList = new List<SaveFileData>();
+        List<SaveFileData<T>> SaveFilesList = new List<SaveFileData<T>>();
         string folderPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
 
         if (Directory.Exists(folderPath))
@@ -82,33 +81,34 @@ public static class SaveManager
             string[] filesFound = Directory.GetFiles(folderPath, "*." + SaveSettingsManager.GetFileFormatExtension());
             foreach (string file in filesFound)
             {
-                //Get file names and get save file data
+                //Get file names and get save file data 
                 string fileName = Path.GetFileName(file);
-                SaveFilesList.Add(GetSaveFileData(fileName));
+                SaveFilesList.Add(GetSaveFileData<T>(fileName));
             }
         }
         else
         {
-            Debug.LogError("Can't find folder in " + folderPath);
+            Debug.LogWarning("Can't find folder in " + folderPath + " creating a new one...");
+            Directory.CreateDirectory(folderPath);
         }
         
         return SaveFilesList;
     }
 
-    public static SaveFileData GetSaveFileData(string saveName)
+    public static SaveFileData<T> GetSaveFileData<T>(string saveName)
     {
         string path = GetPath(saveName, false);
 
         if (File.Exists(path))
         {
-            SaveFileData dataToLoad = null;
+            SaveFileData<T> dataToLoad = null;
 
             switch (SaveSettingsManager.GetFileFormat())
             {
                 //Load SaveFileData from .JSON
                 case FileFormats.JSON:
                     string SaveDataJSON = File.ReadAllText(path);
-                    dataToLoad = JsonUtility.FromJson<SaveFileData>(SaveDataJSON);
+                    dataToLoad = JsonUtility.FromJson<SaveFileData<T>>(SaveDataJSON);
                     break;
 
                 //Load SaveFileData from Binary file
@@ -117,7 +117,7 @@ public static class SaveManager
                     BinaryFormatter formatter = new BinaryFormatter();
                     FileStream stream = new FileStream(path, FileMode.Open);
 
-                    dataToLoad = formatter.Deserialize(stream) as SaveFileData;
+                    dataToLoad = formatter.Deserialize(stream) as SaveFileData<T>;
                     stream.Close();
 
                     Debug.Log("Fetch data Complete !");
@@ -133,17 +133,16 @@ public static class SaveManager
         }
     }
 
-    public static object LoadData(string saveName)
+    public static T LoadData<T>(string saveName)
     {
-        SaveFileData dataToLoad = GetSaveFileData(saveName);
-        if (dataToLoad != null)
-            return dataToLoad.Data;
-        else
+        SaveFileData<T> dataToLoad = GetSaveFileData<T>(saveName + "." + SaveSettingsManager.GetFileFormatExtension());
+        
+        if (dataToLoad == null)
         {
             Debug.LogError("Can't load save file !");
-            return null;
         }
 
+        return dataToLoad.Data;
     }
 
     public static void DeleteSave(string saveName)
