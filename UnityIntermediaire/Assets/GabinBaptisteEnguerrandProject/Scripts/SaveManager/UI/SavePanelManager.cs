@@ -6,17 +6,13 @@ using UnityEngine.UI;
 
 public class SavePanelManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] GameObject _savePanelPrefab;
-
-    [Header("Save Parameters")]
-    [SerializeField] int _maxNumberOfSaves;
-
-    [Header("Panel Parameters")]
-    [SerializeField] Transform _savePanelFirstPosition;
-    [SerializeField] Sprite _savePanelImage;
-    [Space(5)]
-    [SerializeField] float _spaceBetweenTwoSavePanels;
+    public enum PanelImageType
+    {
+        None = 0,
+        SimpleImage = 1,
+        RandomImage = 2,
+        Screenshot = 3
+    }
     public enum ScrollRectDirection
     {
         Horizontal,
@@ -24,8 +20,24 @@ public class SavePanelManager : MonoBehaviour
         Vertical,
         InvertedVertical
     }
-    private ScrollRect _panelScrollRect;
+
+
+    [Header("References")]
+    [SerializeField] GameObject _savePanelPrefab;
+
+    [Header("Save Parameters")]
+    [SerializeField] int _maxNumberOfSaves;
+    [SerializeField] PanelImageType _panelImage;
+    [SerializeField] Sprite _defaultPanelImage;
+    [SerializeField] List<Sprite> _listOfPanelImages;
+
+
+    [Header("Panel Parameters")]
+    [SerializeField] Transform _savePanelFirstPosition;
+    [Space(5)]
+    [SerializeField] float _spaceBetweenTwoSavePanels;
     [SerializeField] ScrollRectDirection _panelScrollDirection;
+    private ScrollRect _panelScrollRect;
 
     [Header("Input save name")]
     [SerializeField] InputField _saveNameField;
@@ -170,9 +182,26 @@ public class SavePanelManager : MonoBehaviour
             saveName = _saveNameField.text;
         
         string _savedata = JsonUtility.ToJson(_saveObject);
-       
 
-        SaveManager.SaveData(_savedata, saveName, _savePanelImage);
+        Sprite savePanelImage = null;
+        switch (_panelImage)
+        {
+            case PanelImageType.None:
+                break;
+            
+            case PanelImageType.SimpleImage:
+                savePanelImage = _defaultPanelImage;
+                break;
+
+            case PanelImageType.RandomImage:
+                savePanelImage = _listOfPanelImages[UnityEngine.Random.Range(0, _listOfPanelImages.Count)];
+                break;
+
+            //case PanelImageType.Screenshot:
+                
+        }
+
+        SaveManager.SaveData(_savedata, saveName, savePanelImage);
 
         RefreshAndCreateSavePanels();
     }
