@@ -405,10 +405,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ca8492efeda00940a1a705d73b770d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _leaf:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  _leaves: []
+  InstantiateLeaves: []
+  nameText: Water
+  position: {x: 0, y: 20}
+  leafPrefab: {fileID: 2083972630765367120, guid: 541b8e7d31acd8a449415442202ad3de, type: 3}
+  price: 100
+  number: 0
+  isLocked: 1
 --- !u!4 &1140961767
 Transform:
   m_ObjectHideFlags: 0
