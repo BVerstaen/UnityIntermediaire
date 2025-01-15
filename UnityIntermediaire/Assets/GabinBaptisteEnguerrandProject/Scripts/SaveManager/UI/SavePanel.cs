@@ -28,7 +28,7 @@ public class SavePanel : MonoBehaviour
             _deleteButton.enabled = _showDeleteButton;
     }
 
-    public void LoadDataFromSaveFile(SaveFileData saveFile)
+    public void LoadDataFromSaveFile<T>(SaveFileData<T> saveFile)
     {
         if(_saveNameText != null)
             _saveNameText.text = saveFile.FileName;

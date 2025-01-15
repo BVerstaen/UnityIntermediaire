@@ -1,8 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+
+public interface ISaveable
+{
+}
 
 public class SavePanelManager : MonoBehaviour
 {
@@ -15,10 +20,13 @@ public class SavePanelManager : MonoBehaviour
     [SerializeField] Sprite _savePanelImage;
     [SerializeField] float _spaceBetweenTwoSavePanels;
 
+    [SerializeField] TestSaveScript _saveObject;
+
     List<SavePanel> _savePanels;
     SavePanel _selectedPanel;
 
     Vector2 _newPanelPosition;
+
 
     private void Start()
     {
@@ -43,7 +51,7 @@ public class SavePanelManager : MonoBehaviour
         }
 
         //Get every saves
-        List<SaveManager.SaveFileData> saveFiles = SaveManager.GetEverySaveFile();
+        List<SaveManager.SaveFileData<string>> saveFiles = SaveManager.GetEverySaveFile<string>();
 
         //Create corresponding save panels
         foreach (var file in saveFiles) 
@@ -84,29 +92,26 @@ public class SavePanelManager : MonoBehaviour
     }
 
     //Buttons functions
-    public void CreateSave()
+    public void CreateSave(Component _saveObject)
     {
-        //TEMP Create false object to test saving
-        string newObject = "ok";
-
         //Change save name if use save name field
         string saveName = "Save";
         if(_saveNameField != null)
             saveName = _saveNameField.text;
+        
+        string _savedata = JsonUtility.ToJson(_saveObject);
 
-        SaveManager.SaveData(newObject, saveName, _savePanelImage);
+        SaveManager.SaveData(_savedata, saveName, _savePanelImage);
 
         RefreshAndCreateSavePanels();
     }
 
-    public void LoadSave()
+    public T LoadSave<T>()
     {
-        if(_selectedPanel != null)
-        {
-            string LoadedSave = SaveManager.LoadData(_selectedPanel.SaveName);
-            Debug.Log(LoadedSave);
-        }
+        if (_selectedPanel == null) throw new Exception("Missing selected Panel");
 
+        string _loadedJson = SaveManager.LoadData<string>(_selectedPanel.SaveName);
+        return JsonUtility.FromJson<T>(_loadedJson);
     }
 
     public void EraseSave()
