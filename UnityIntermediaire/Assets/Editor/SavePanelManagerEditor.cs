@@ -17,7 +17,6 @@ public class SavePanelManagerEditor : Editor
 
 
     SerializedProperty _savePanelFirstPosition;
-    SerializedProperty _savePanelImage;
     SerializedProperty _spaceBetweenTwoSavePanels;
     SerializedProperty _panelScrollDirection;
 
@@ -38,7 +37,6 @@ public class SavePanelManagerEditor : Editor
         _listOfPanelImages = serializedObject.FindProperty("_listOfPanelImages");
 
         _savePanelFirstPosition = serializedObject.FindProperty("_savePanelFirstPosition");
-        _savePanelImage = serializedObject.FindProperty("_savePanelImage");
         _spaceBetweenTwoSavePanels = serializedObject.FindProperty("_spaceBetweenTwoSavePanels");
         _panelScrollDirection = serializedObject.FindProperty("_panelScrollDirection");
         
@@ -76,10 +74,9 @@ public class SavePanelManagerEditor : Editor
         
 
         EditorGUILayout.PropertyField(_savePanelFirstPosition);
-        EditorGUILayout.PropertyField(_savePanelImage);
         EditorGUILayout.PropertyField(_spaceBetweenTwoSavePanels);
         EditorGUILayout.PropertyField(_panelScrollDirection);
-
+        
         EditorGUILayout.PropertyField(_saveNameField);
         if (_saveNameField.objectReferenceValue == null)
         {
