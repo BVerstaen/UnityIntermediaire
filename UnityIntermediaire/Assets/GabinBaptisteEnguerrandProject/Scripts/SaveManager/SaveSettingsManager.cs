@@ -6,6 +6,8 @@ using static SaveManager;
 
 public static class SaveSettingsManager
 {
+    static SaveSettings _loadedSettings;
+
     public static string GetFolderName()
     {
         return GetCurrentSavesSettings().FolderName;
@@ -32,11 +34,17 @@ public static class SaveSettingsManager
 
     private static SaveSettings GetCurrentSavesSettings()
     {
-        if (SaveSettings.Instance == null)
+        if (_loadedSettings == null)
         {
-            SaveSettings currentSaveSettings = AssetDatabase.LoadAssetAtPath<SaveSettings>("Assets/GabinBaptisteEnguerrandProject/Scripts/SaveManager/DefaultSaveSettings.asset");
-            SaveSettings.Instance = currentSaveSettings;
+            SaveSettings currentSaveSettings = Resources.Load("SaveManager\\DefaultSaveSettings") as SaveSettings;
+            if(currentSaveSettings == null)
+            {
+                Debug.LogWarning("No Default Save Settings Present in Ressources/SaveManager/DefaultSaveSettings, creating one per default...");
+                currentSaveSettings =  ScriptableObject.CreateInstance<SaveSettings>();
+            }
+
+            _loadedSettings = currentSaveSettings;
         }
-        return SaveSettings.Instance;
+        return _loadedSettings;
     }
 }

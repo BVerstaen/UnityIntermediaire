@@ -304,6 +304,9 @@ MonoBehaviour:
   _dateText: {fileID: 8078294937170051679}
   _saveImg: {fileID: 3121383387956117131}
   _deleteButton: {fileID: 3650080155484066833}
+  _showNameText: 1
+  _showDateText: 1
+  _showImage: 1
   _showDeleteButton: 1
   _objectsActivatedWhenSelected:
   - {fileID: 5701502381727353308}
