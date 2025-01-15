@@ -7,21 +7,22 @@ using UnityEngine;
 
 public static class SaveManager
 {
+
     public enum FileFormats { JSON, BINARY }
 
     [System.Serializable]
     public class SaveFileData
     {
         public string FileName;
-        public string FileImagePath;
+        public string FileImage;
         public string FileDate;
 
-        public object Data;
+        public string Data;
 
-        public SaveFileData(object newData, string filename, Sprite fileImage)
+        public SaveFileData(string newData, string filename, Sprite fileImage)
         {
             FileName = filename;
-            FileImagePath = AssetDatabase.GetAssetPath(fileImage.GetInstanceID());
+            FileImage = fileImage.name;
             
             DateTime dt = DateTime.Now;
             FileDate = dt.ToString("dd/MM/yyyy - HH:mm:ss");
@@ -35,7 +36,7 @@ public static class SaveManager
         return Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + (withExtension ? "." + SaveSettingsManager.GetFileFormatExtension() : "");
     }
 
-    public static void SaveData(object dataToSave, string saveName, Sprite FileImage = null)
+    public static void SaveData(string dataToSave, string saveName, Sprite FileImage = null)
     {
         //Create save file data & get save path
         string path = GetPath(saveName);
@@ -89,7 +90,8 @@ public static class SaveManager
         }
         else
         {
-            Debug.LogError("Can't find folder in " + folderPath);
+            Debug.LogWarning("Can't find folder in " + folderPath + " creating a new one...");
+            Directory.CreateDirectory(folderPath);
         }
         
         return SaveFilesList;
@@ -133,9 +135,9 @@ public static class SaveManager
         }
     }
 
-    public static object LoadData(string saveName)
+    public static string LoadData(string saveName)
     {
-        SaveFileData dataToLoad = GetSaveFileData(saveName);
+        SaveFileData dataToLoad = GetSaveFileData(saveName + "." + SaveSettingsManager.GetFileFormatExtension());
         if (dataToLoad != null)
             return dataToLoad.Data;
         else

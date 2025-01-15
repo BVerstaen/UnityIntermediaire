@@ -38,9 +38,10 @@ public class SavePanel : MonoBehaviour
         if(_dateText != null)
             _dateText.text = saveFile.FileDate;
 
-        if(saveFile.FileImagePath != string.Empty && _saveImg != null)
+        if (saveFile.FileImage != string.Empty && _saveImg != null)
         {
-            _saveImg.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(saveFile.FileImagePath);
+
+            _saveImg.sprite = Resources.Load("SaveManager\\" + saveFile.FileImage) as Sprite;
             _saveImg.enabled = true;
         }
         else

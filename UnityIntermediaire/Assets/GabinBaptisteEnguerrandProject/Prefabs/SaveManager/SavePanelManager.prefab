@@ -88,7 +88,7 @@ MonoBehaviour:
   _savePanelPrefab: {fileID: 4605454968339237317, guid: 51374337eaa9ad049ade300b6822e101, type: 3}
   _saveNameField: {fileID: 0}
   _savePanelFirstPosition: {fileID: 8558620974344710371}
-  _savePanelImage: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  _savePanelImage: {fileID: 21300000, guid: 2246a856ac513d646a3396bf62c0a2a6, type: 3}
   _spaceBetweenTwoSavePanels: 450
 --- !u!114 &8428164802339756835
 MonoBehaviour:

@@ -14,7 +14,6 @@ public class SavePanelManager : MonoBehaviour
     [SerializeField] Transform _savePanelFirstPosition;
     [SerializeField] Sprite _savePanelImage;
     [SerializeField] float _spaceBetweenTwoSavePanels;
-    
 
     List<SavePanel> _savePanels;
     SavePanel _selectedPanel;
@@ -88,7 +87,7 @@ public class SavePanelManager : MonoBehaviour
     public void CreateSave()
     {
         //TEMP Create false object to test saving
-        object newObject = new object();
+        string newObject = "ok";
 
         //Change save name if use save name field
         string saveName = "Save";
@@ -104,7 +103,7 @@ public class SavePanelManager : MonoBehaviour
     {
         if(_selectedPanel != null)
         {
-            object LoadedSave = SaveManager.LoadData(_selectedPanel.SaveName);
+            string LoadedSave = SaveManager.LoadData(_selectedPanel.SaveName);
             Debug.Log(LoadedSave);
         }
 
