@@ -40,8 +40,7 @@ public class SavePanel : MonoBehaviour
 
         if (saveFile.FileImage != string.Empty && _saveImg != null)
         {
-
-            _saveImg.sprite = Resources.Load("SaveManager\\" + saveFile.FileImage) as Sprite;
+            _saveImg.sprite = Resources.Load<Sprite>("SaveManager\\" + saveFile.FileImage);
             _saveImg.enabled = true;
         }
         else

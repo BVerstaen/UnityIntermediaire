@@ -83,7 +83,7 @@ public static class SaveManager
             string[] filesFound = Directory.GetFiles(folderPath, "*." + SaveSettingsManager.GetFileFormatExtension());
             foreach (string file in filesFound)
             {
-                //Get file names and get save file data
+                //Get file names and get save file data 
                 string fileName = Path.GetFileName(file);
                 SaveFilesList.Add(GetSaveFileData(fileName));
             }
