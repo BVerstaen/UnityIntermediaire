@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using UnityEditor;
 using UnityEngine;
 
 public static class SaveManager
 {
-
     public enum FileFormats { JSON, BINARY }
 
     [System.Serializable]

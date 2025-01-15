@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static SaveManager;
@@ -13,8 +12,11 @@ public class SavePanel : MonoBehaviour
     [SerializeField] Image _saveImg;
     [SerializeField] Button _deleteButton;
 
-    [Header("Parameters")]
-    [SerializeField] bool _showDeleteButton;
+    [Header("Custom UI")]
+    [SerializeField] bool _showNameText = true;
+    [SerializeField] bool _showDateText = true;
+    [SerializeField] bool _showImage = true;
+    [SerializeField] bool _showDeleteButton = true;
 
     [SerializeField] List<GameObject> _objectsActivatedWhenSelected;
 
@@ -24,6 +26,16 @@ public class SavePanel : MonoBehaviour
 
     private void Awake()
     {
+        //Show / Hide UI depending on choice
+        if (_saveNameText != null)
+            _saveNameText.enabled = _showNameText;
+
+        if(_showDateText != null)
+            _dateText.enabled = _showDateText;
+
+        if(_showImage != null)
+            _saveImg.enabled = _showImage;
+
         if(_deleteButton != null)
             _deleteButton.enabled = _showDeleteButton;
     }
