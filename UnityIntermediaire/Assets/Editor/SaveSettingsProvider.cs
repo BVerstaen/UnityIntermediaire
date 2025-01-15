@@ -32,9 +32,6 @@ public class SaveSettingsProvider : SettingsProvider
                 settings = ScriptableObject.CreateInstance<SaveSettings>();
                 AssetDatabase.CreateAsset(settings, "Assets/Resources/SaveManager/DefaultSaveSettings.asset");
 
-                //Create Instance reference
-                SaveSettings.Instance = settings;
-
                 AssetDatabase.SaveAssets();
             }
         }

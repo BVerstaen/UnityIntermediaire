@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestSaveScript : MonoBehaviour, ISaveable
+public class TestSaveScript : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private SavePanelManager _savePanelManager;

@@ -4,10 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public interface ISaveable
-{
-}
-
 public class SavePanelManager : MonoBehaviour
 {
     [Header("References")]

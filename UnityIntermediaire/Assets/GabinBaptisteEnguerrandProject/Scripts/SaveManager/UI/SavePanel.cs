@@ -16,6 +16,7 @@ public class SavePanel : MonoBehaviour
     [SerializeField] bool _showNameText = true;
     [SerializeField] bool _showDateText = true;
     [SerializeField] bool _showImage = true;
+    [SerializeField] bool _showLoadButton = true;
     [SerializeField] bool _showDeleteButton = true;
 
     [SerializeField] List<GameObject> _objectsActivatedWhenSelected;
@@ -30,10 +31,10 @@ public class SavePanel : MonoBehaviour
         if (_saveNameText != null)
             _saveNameText.enabled = _showNameText;
 
-        if(_showDateText != null)
+        if(_dateText != null)
             _dateText.enabled = _showDateText;
 
-        if(_showImage != null)
+        if(_saveImg != null)
             _saveImg.enabled = _showImage;
 
         if(_deleteButton != null)
