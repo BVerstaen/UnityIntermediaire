@@ -42,12 +42,20 @@ public class SaveSettingsProvider : SettingsProvider
     {
         settings = GetOrCreateSettings();
 
+        //Delete everything in save folder
+        if (GUILayout.Button("Erase All save files"))
+        {
+            Directory.Delete(Application.persistentDataPath, true);
+        }
+
         //Create Editor Settings
         EditorGUILayout.LabelField("Save Settings", EditorStyles.boldLabel);
-        settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);        
+        settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);
+
         //Show binary extension if binary format is selected
         if(settings.FileFormat == FileFormats.BINARY)
             settings.FileFormatExtension = EditorGUILayout.TextField("File Extension :", settings.FileFormatExtension);
+        
         //Don't show default folder name if using profiles is selected
         if (!settings.UseProfiles)
             settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
@@ -55,7 +63,9 @@ public class SaveSettingsProvider : SettingsProvider
         EditorGUILayout.Space();
         
         EditorGUILayout.LabelField("Profile Settings", EditorStyles.boldLabel);
+        
         settings.UseProfiles = EditorGUILayout.ToggleLeft("Use profiles", settings.UseProfiles);
+        //Show maximum number of profiles if use profiles
         if (settings.UseProfiles)
             settings.MaximumNumberOfProfiles = EditorGUILayout.IntField("Maximum number of profiles", settings.MaximumNumberOfProfiles);
 

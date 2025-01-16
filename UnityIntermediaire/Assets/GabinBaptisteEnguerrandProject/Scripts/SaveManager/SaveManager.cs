@@ -43,6 +43,16 @@ public static class SaveManager
         if(fileImage == null)
             SaveFile.hasCorrespondingImage = takeScreenShot;
 
+        //If using profiles, then check if there's a valid profile
+        if (SaveSettingsManager.UseProfiles())
+        {
+            if (SaveSettingsManager.GetFolderName() == "")
+            {
+                Debug.LogWarning("No profile selected !");
+                return;
+            }
+        }
+
         //Create save foldier if doesn't exist
         string directoryPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
         if (!Directory.Exists(directoryPath))

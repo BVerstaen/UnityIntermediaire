@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ProfileManager : MonoBehaviour
 {
-    public static void CreateProfile(string profileName, bool changeIntoNewProfile = false)
+    public static void CreateProfile(string profileName)
     {
         string path = Application.persistentDataPath + "/" + profileName;
 
@@ -37,7 +37,7 @@ public class ProfileManager : MonoBehaviour
         Directory.Delete(path, true);
 
         //Change folder name to unknwown value
-        SaveSettingsManager.ChangeFolderName("");
+        SaveSettingsManager.ChangeProfileFolderName("");
     }
 
     public static void ChangeProfile(string newProfileName)
@@ -49,7 +49,7 @@ public class ProfileManager : MonoBehaviour
             Debug.LogError("Can't find profile : " + newProfileName);
             return;
         }
-        SaveSettingsManager.ChangeFolderName(newProfileName);
+        SaveSettingsManager.ChangeProfileFolderName(newProfileName);
     }
 
     public static string GetCurrentProfile()

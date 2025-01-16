@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,12 @@ public class ProfileUI : MonoBehaviour
 
     private void Awake()
     {
+        if (!SaveSettingsManager.UseProfiles())
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         RefreshProfileDropDown();
     }
 
@@ -25,7 +32,8 @@ public class ProfileUI : MonoBehaviour
         List<Dropdown.OptionData> profileDropDownList = new List<Dropdown.OptionData>();
         foreach (string profile in profileList)
         {
-            profileDropDownList.Add(new Dropdown.OptionData(profile));
+            var dirName = new DirectoryInfo(profile).Name;
+            profileDropDownList.Add(new Dropdown.OptionData(dirName));
         }
         _exampleDropdown.AddOptions(profileDropDownList);
     }
@@ -39,7 +47,9 @@ public class ProfileUI : MonoBehaviour
         }
         
 
-        ProfileManager.CreateProfile(_exampleInputField.text, true);
+        ProfileManager.CreateProfile(_exampleInputField.text);
+        ProfileManager.ChangeProfile(_exampleInputField.text);
+
         RefreshProfileDropDown();
 
         if(_savePanelManager != null)
@@ -47,9 +57,20 @@ public class ProfileUI : MonoBehaviour
     }
     public void ChangeProfile(string newProfile)
     {
+        ProfileManager.ChangeProfile(newProfile);
 
         if (_savePanelManager != null)
             _savePanelManager.RefreshAndCreateSavePanels();
+    }
+
+    public void ChangeProfileFromDropdown()
+    {
+        if (_exampleDropdown == null)
+        {
+            Debug.LogError("Can't find linked dropdown");
+            return;
+        }
+        ChangeProfile(_exampleDropdown.options[_exampleDropdown.value].text);
     }
 
     public void EraseProfile()
