@@ -8,9 +8,13 @@ using Unity.VisualScripting.YamlDotNet.Serialization;
 public class SavePanelManagerEditor : Editor
 {
     SerializedProperty _savePanelPrefab;
+    
     SerializedProperty _maxNumberOfSaves;
+    SerializedProperty _panelImage;
+    SerializedProperty _defaultPanelImage;
+    SerializedProperty _listOfPanelImages;
+
     SerializedProperty _savePanelFirstPosition;
-    SerializedProperty _savePanelImage;
     SerializedProperty _spaceBetweenTwoSavePanels;
     SerializedProperty _panelScrollDirection;
 
@@ -24,9 +28,13 @@ public class SavePanelManagerEditor : Editor
     private void OnEnable()
     {
         _savePanelPrefab = serializedObject.FindProperty("_savePanelPrefab");
+        
         _maxNumberOfSaves = serializedObject.FindProperty("_maxNumberOfSaves");
+        _panelImage = serializedObject.FindProperty("_panelImage");
+        _defaultPanelImage = serializedObject.FindProperty("_defaultPanelImage");
+        _listOfPanelImages = serializedObject.FindProperty("_listOfPanelImages");
+
         _savePanelFirstPosition = serializedObject.FindProperty("_savePanelFirstPosition");
-        _savePanelImage = serializedObject.FindProperty("_savePanelImage");
         _spaceBetweenTwoSavePanels = serializedObject.FindProperty("_spaceBetweenTwoSavePanels");
         _panelScrollDirection = serializedObject.FindProperty("_panelScrollDirection");
         
@@ -42,12 +50,31 @@ public class SavePanelManagerEditor : Editor
         serializedObject.Update();
 
         EditorGUILayout.PropertyField(_savePanelPrefab);
+
         EditorGUILayout.PropertyField(_maxNumberOfSaves);
+        EditorGUILayout.PropertyField(_panelImage);
+        switch (_panelImage.intValue)
+        {
+            case 0:
+            case 3:
+            default:
+                break;
+
+            case 1:
+                EditorGUILayout.PropertyField(_defaultPanelImage);
+                break;
+
+            case 2:
+                EditorGUILayout.PropertyField(_listOfPanelImages);
+                break;
+        }
+
+        
+
         EditorGUILayout.PropertyField(_savePanelFirstPosition);
-        EditorGUILayout.PropertyField(_savePanelImage);
         EditorGUILayout.PropertyField(_spaceBetweenTwoSavePanels);
         EditorGUILayout.PropertyField(_panelScrollDirection);
-
+        
         EditorGUILayout.PropertyField(_saveNameField);
         if (_saveNameField.objectReferenceValue == null)
         {

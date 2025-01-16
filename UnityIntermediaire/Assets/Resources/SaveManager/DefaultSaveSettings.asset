@@ -15,3 +15,7 @@ MonoBehaviour:
   FileFormat: 0
   FileFormatExtension: bin
   FolderName: Saves
+  UseProfiles: 1
+  MaximumNumberOfProfiles: 4
+  ProfileFolderName: Profiles
+  SelectedFolderName: 

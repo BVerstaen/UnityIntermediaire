@@ -42,15 +42,42 @@ public class SaveSettingsProvider : SettingsProvider
     {
         settings = GetOrCreateSettings();
 
+        //Delete everything in save folder
+        if (GUILayout.Button("Erase All save files"))
+        {
+            string SaveFolder = Application.persistentDataPath + "/" + settings.FolderName;
+            string ProfileFolder = Application.persistentDataPath + "/" + settings.ProfileFolderName;
+            
+            if (Directory.Exists(SaveFolder))
+                Directory.Delete(SaveFolder, true);
+
+            if (Directory.Exists(ProfileFolder))
+                Directory.Delete(ProfileFolder, true);
+        }
+
         //Create Editor Settings
         EditorGUILayout.LabelField("Save Settings", EditorStyles.boldLabel);
         settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);
-        
+
         //Show binary extension if binary format is selected
         if(settings.FileFormat == FileFormats.BINARY)
-            settings.FileFormatExtension = EditorGUILayout.TextField("File Extension :", settings.FileFormatExtension);
+            settings.FileFormatExtension = EditorGUILayout.TextField("File extension :", settings.FileFormatExtension);
         
-        settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
+        //Don't show default folder name if using profiles is selected
+        if (!settings.UseProfiles)
+            settings.FolderName = EditorGUILayout.TextField("Folder name", settings.FolderName);
+        
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.LabelField("Profile Settings", EditorStyles.boldLabel);
+        
+        settings.UseProfiles = EditorGUILayout.ToggleLeft("Use profiles", settings.UseProfiles);
+        //Show maximum number of profiles if use profiles
+        if (settings.UseProfiles)
+        {
+            settings.MaximumNumberOfProfiles = EditorGUILayout.IntField("Maximum number of profiles", settings.MaximumNumberOfProfiles);
+            settings.ProfileFolderName = EditorGUILayout.TextField("Profile folder name :", settings.ProfileFolderName);
+        }
 
         if (GUI.changed)
         {

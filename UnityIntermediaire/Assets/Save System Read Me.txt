@@ -1,0 +1,33 @@
+Liste des features du Save system :
+
+Les paramètres globaux de sauvegarde et de profiles sont dans "ProjectSettings -> Save Settings"
+	-Pouvoir effacer toutes les sauvegardes et profiles dans l'éditeur
+
+	-Possibilité de customiser le format de fichier (Json / Binary)
+	-Possibilité de customiser l'extension du fichier (si Binary est sélectionné)
+	-Possibilité de customiser le nom du dossier de sauvegarde
+
+	-Possibilité de passer de sauvegarde individuelle à des profiles
+	-Possibilité de customisé le nombre de profil
+	-Possibilité de customiser le nom du dossier contenant les profiles
+
+Le script Save Manager peut sauvegarder n'importe quel type T pouvant être sauvegardé en Json/Binary à l'aide de 2 fonctions :
+	- SaveData<T>(T dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
+		Il est notamment possible de mettre une image, voire de prendre une capture d'écran
+		
+	- T LoadData<T>(string saveName)
+
+Le prefab SavePanelManager permet de fournir une liste de sauvegarde avec :
+	-Nombre de sauvegardes maximum
+	-L'image montrée (Rien, une image, une image aléatoire parmi une liste, une capture d'écran)
+	-L'espacement entre les pannaux et la direction dans laquelle ils s'affichent
+	-Possibilité de lier un "input field" pour rentrer un nom de sauvegarde
+	-Sinon, possibilité de mettre un nom de sauvegarde par défaut
+	-Avec comme possibilité d'incrémenter automatiquement quand crée une sauvegarde
+	-un Unity Event pour ajouter des feedbacks qd le nombre limite de sauvegardes est atteinte
+
+	-Une fonction "CreateSaveFromComponent" permettant de créer une sauvegarde de toute les variables de n'importe quel component
+
+La scène saveExampleScene contient un cas d'exemple utilisant un script possédant des variables (TestSaveContener) et étant sauvegardé / chargé par un autre script (TestSaveScript) qui se contente d'appeler des fonctions de SavePanelManager.
+
+La scène d'example affichera aussi une sélection des profiles si "use profiles" est activé dans les paramètres, avec al possibilité de créer, changer et effacer des profiles à l'aide du script d'example ProfileUI.

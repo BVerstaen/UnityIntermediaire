@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using static SaveManager;
 
@@ -10,12 +9,13 @@ public static class SaveSettingsManager
 
     public static string GetFolderName()
     {
-        return GetCurrentSavesSettings().FolderName;
+        SaveSettings currentSaveSettings = GetCurrentSavesSettings();
+        return currentSaveSettings.UseProfiles ? currentSaveSettings.ProfileFolderName + "/" + currentSaveSettings.SelectedFolderName : GetCurrentSavesSettings().FolderName;
     }
 
     public static FileFormats GetFileFormat()
     {
-        return GetCurrentSavesSettings().FileFormat;
+        return  GetCurrentSavesSettings().FileFormat;
     }
 
     public static string GetFileFormatExtension()
@@ -30,6 +30,27 @@ public static class SaveSettingsManager
         }
 
         return "";
+    }
+
+    public static bool UseProfiles()
+    {
+        return GetCurrentSavesSettings().UseProfiles;
+    }
+
+    public static int GetMaximumNumberOfProfiles()
+    {
+        return GetCurrentSavesSettings().MaximumNumberOfProfiles;
+    }
+
+    public static string GetProfileFolderName()
+    {
+        return GetCurrentSavesSettings().ProfileFolderName;
+    }
+
+    public static void ChangeProfileFolderName(string newFolderName)
+    {
+        SaveSettings currentSaveSettings = GetCurrentSavesSettings();
+        currentSaveSettings.SelectedFolderName = newFolderName;
     }
 
     private static SaveSettings GetCurrentSavesSettings()

@@ -12,16 +12,15 @@ public static class SaveManager
     public class SaveFileData<T>
     {
         public string FileName;
-        public string FileImage;
+        public bool hasCorrespondingImage;
         public string FileDate;
 
         public T Data;
 
-        public SaveFileData(T newData, string filename, Sprite fileImage)
+        public SaveFileData(T newData, string filename, Texture2D fileImage)
         {
             FileName = filename;
-            FileImage = fileImage.name;
-            
+            hasCorrespondingImage = fileImage != null;
             DateTime dt = DateTime.Now;
             FileDate = dt.ToString("dd/MM/yyyy - HH:mm:ss");
 
@@ -29,16 +28,30 @@ public static class SaveManager
         }
     }
 
-    private static string GetPath(string saveName, bool withExtension = true)
+    private static string GetSaveFilePath(string saveName, bool withExtension = true)
     {
         return Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + (withExtension ? "." + SaveSettingsManager.GetFileFormatExtension() : "");
     }
 
-    public static void SaveData<T>(T dataToSave, string saveName, Sprite FileImage = null)
+    public static void SaveData<T>(T dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
         //Create save file data & get save path
-        string path = GetPath(saveName);
-        SaveFileData<T> SaveFile = new SaveFileData<T>(dataToSave, saveName, FileImage);
+        string path = GetSaveFilePath(saveName);
+        SaveFileData<T> SaveFile = new SaveFileData<T>(dataToSave, saveName, fileImage);
+
+        //Notify that corresponding image exist if take screenshot instead
+        if(fileImage == null)
+            SaveFile.hasCorrespondingImage = takeScreenShot;
+
+        //If using profiles, then check if there's a valid profile
+        if (SaveSettingsManager.UseProfiles())
+        {
+            if (SaveSettingsManager.GetFolderName() == "")
+            {
+                Debug.LogWarning("No profile selected !");
+                return;
+            }
+        }
 
         //Create save foldier if doesn't exist
         string directoryPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName();
@@ -66,6 +79,60 @@ public static class SaveManager
 
                 Debug.Log("Save Complete !");
                 break;
+        }
+
+        //Delete old corresponding image if already exist
+        string imgPath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + ".png";
+        DeleteCorrespondingImage(saveName);
+
+        //Take and save screenshot if possible
+        if (takeScreenShot)
+        {
+            ScreenCapture.CaptureScreenshot(imgPath);
+        }
+        //Save File Image if exist
+        else if (fileImage != null)
+        {
+            if (!File.Exists(imgPath))
+            {
+                Texture2D texture = CreateReadableTexture(fileImage);
+
+                if (texture.isReadable)
+                {
+                    byte[] fileToBytes = texture.EncodeToPNG();
+                    File.WriteAllBytes(imgPath, fileToBytes);
+                }
+                else
+                {
+                    Debug.LogError(fileImage + " doesn't have his \"Read/Write\" bool set to true, therefore no fileImage can be created.");
+                }
+            }
+        }
+
+
+
+        Texture2D CreateReadableTexture(Texture2D source)
+        {
+            Texture2D newTexture = new Texture2D(source.width, source.height);
+
+            //Copy pixels from source texture to temporary "renderTex" texture2D
+            RenderTexture renderTex = RenderTexture.GetTemporary(
+                source.width,
+                source.height,
+                0,
+                RenderTextureFormat.Default,
+                RenderTextureReadWrite.Linear
+            );
+            Graphics.Blit(source, renderTex);
+
+            //"paste" them into newtexture
+            newTexture.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+            newTexture.Apply();
+
+            //free memory allocated to renderTex
+            RenderTexture.ReleaseTemporary(renderTex);
+
+            return newTexture;
         }
 
     }
@@ -97,7 +164,7 @@ public static class SaveManager
 
     public static SaveFileData<T> GetSaveFileData<T>(string saveName)
     {
-        string path = GetPath(saveName, false);
+        string path = GetSaveFilePath(saveName, false);
 
         if (File.Exists(path))
         {
@@ -147,10 +214,19 @@ public static class SaveManager
 
     public static void DeleteSave(string saveName)
     {
-        string path = GetPath(saveName);
+        string path = GetSaveFilePath(saveName);
         if (File.Exists(path))
             File.Delete(path);
         else
             Debug.LogError("Save file can't be found in " + path);
+
+        DeleteCorrespondingImage(saveName);
+    }
+
+    private static void DeleteCorrespondingImage(string saveName)
+    {
+        string correspondingImagePath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + ".png";
+        if (File.Exists(correspondingImagePath))
+            File.Delete(correspondingImagePath);
     }
 }

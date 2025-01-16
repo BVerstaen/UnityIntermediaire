@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class SavePanelManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] GameObject _savePanelPrefab;
-
-    [Header("Save Parameters")]
-    [SerializeField] int _maxNumberOfSaves;
-
-    [Header("Panel Parameters")]
-    [SerializeField] Transform _savePanelFirstPosition;
-    [SerializeField] Sprite _savePanelImage;
-    [Space(5)]
-    [SerializeField] float _spaceBetweenTwoSavePanels;
+    public enum PanelImageType
+    {
+        None = 0,
+        SimpleImage = 1,
+        RandomImage = 2,
+        Screenshot = 3
+    }
     public enum ScrollRectDirection
     {
         Horizontal,
@@ -24,8 +21,24 @@ public class SavePanelManager : MonoBehaviour
         Vertical,
         InvertedVertical
     }
-    private ScrollRect _panelScrollRect;
+
+
+    [Header("References")]
+    [SerializeField] GameObject _savePanelPrefab;
+
+    [Header("Save parameters")]
+    [SerializeField] int _maxNumberOfSaves;
+    [SerializeField] PanelImageType _panelImage;
+    [SerializeField] Sprite _defaultPanelImage;
+    [SerializeField] List<Sprite> _listOfPanelImages;
+
+
+    [Header("Panel placments parameters")]
+    [SerializeField] Transform _savePanelFirstPosition;
+    [Space(5)]
+    [SerializeField] float _spaceBetweenTwoSavePanels;
     [SerializeField] ScrollRectDirection _panelScrollDirection;
+    private ScrollRect _panelScrollRect;
 
     [Header("Input save name")]
     [SerializeField] InputField _saveNameField;
@@ -157,22 +170,44 @@ public class SavePanelManager : MonoBehaviour
     //Buttons functions
     public void CreateSaveFromComponent(Component _saveObject)
     {
-        //Check if reach maximum number of saves files
-        if(_maxNumberOfSaves <= _savePanels.Count)
+        //Change save name if use save name field
+        string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
+        if(_saveNameField != null)
+            saveName = _saveNameField.text;
+
+
+        //Check if reach maximum number of saves files and if creating new file
+        if(_maxNumberOfSaves <= _savePanels.Count && !DoesSaveAlreadyExist(saveName))
         {
             Debug.LogWarning("Maximum number of saves reached !");
             return;
         }
 
-        //Change save name if use save name field
-        string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
-        if(_saveNameField != null)
-            saveName = _saveNameField.text;
         
         string _savedata = JsonUtility.ToJson(_saveObject);
-       
 
-        SaveManager.SaveData(_savedata, saveName, _savePanelImage);
+        Texture2D savePanelImage = null;
+        bool takeScreenShot = false;
+        switch (_panelImage)
+        {
+            case PanelImageType.None:
+                break;
+            
+            case PanelImageType.SimpleImage:
+                savePanelImage = _defaultPanelImage.texture;
+                break;
+
+            case PanelImageType.RandomImage:
+                savePanelImage = _listOfPanelImages[UnityEngine.Random.Range(0, _listOfPanelImages.Count)].texture;
+                break;
+
+            case PanelImageType.Screenshot:
+                takeScreenShot = true;
+                break;
+                
+        }
+
+        SaveManager.SaveData(_savedata, saveName, savePanelImage, takeScreenShot);
 
         RefreshAndCreateSavePanels();
     }
@@ -193,5 +228,12 @@ public class SavePanelManager : MonoBehaviour
         }
 
         RefreshAndCreateSavePanels();
+    }
+
+    private bool DoesSaveAlreadyExist(string saveName)
+    {
+        string path = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
+
+        return File.Exists(path);
     }
 }
