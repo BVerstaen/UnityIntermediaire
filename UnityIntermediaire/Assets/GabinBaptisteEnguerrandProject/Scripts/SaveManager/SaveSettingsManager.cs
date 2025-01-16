@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using static SaveManager;
 
@@ -30,6 +29,19 @@ public static class SaveSettingsManager
         }
 
         return "";
+    }
+
+    public static int GetMaximumNumberOfProfiles()
+    {
+        SaveSettings currentSaveSettings = GetCurrentSavesSettings();
+        return currentSaveSettings.MaximumNumberOfProfiles;
+    }
+
+    public static void ChangeFolderName(string newFolderName)
+    {
+        SaveSettings currentSaveSettings = GetCurrentSavesSettings();
+
+        currentSaveSettings.FolderName = newFolderName;
     }
 
     private static SaveSettings GetCurrentSavesSettings()

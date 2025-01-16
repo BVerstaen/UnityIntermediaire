@@ -8,5 +8,8 @@ public class SaveSettings : ScriptableObject
     public FileFormats FileFormat = FileFormats.BINARY;
     public string FileFormatExtension = "bin";
     public string FolderName = "Saves";
+
+    public bool UseProfiles;
+    public int MaximumNumberOfProfiles;
 }
 

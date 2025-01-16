@@ -13,8 +13,6 @@ public class SavePanelManagerEditor : Editor
     SerializedProperty _panelImage;
     SerializedProperty _defaultPanelImage;
     SerializedProperty _listOfPanelImages;
-    
-
 
     SerializedProperty _savePanelFirstPosition;
     SerializedProperty _spaceBetweenTwoSavePanels;

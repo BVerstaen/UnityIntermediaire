@@ -44,13 +44,20 @@ public class SaveSettingsProvider : SettingsProvider
 
         //Create Editor Settings
         EditorGUILayout.LabelField("Save Settings", EditorStyles.boldLabel);
-        settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);
-        
+        settings.FileFormat = (FileFormats)EditorGUILayout.EnumPopup("File format : ", settings.FileFormat);        
         //Show binary extension if binary format is selected
         if(settings.FileFormat == FileFormats.BINARY)
             settings.FileFormatExtension = EditorGUILayout.TextField("File Extension :", settings.FileFormatExtension);
+        //Don't show default folder name if using profiles is selected
+        if (!settings.UseProfiles)
+            settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
         
-        settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
+        EditorGUILayout.Space();
+        
+        EditorGUILayout.LabelField("Profile Settings", EditorStyles.boldLabel);
+        settings.UseProfiles = EditorGUILayout.ToggleLeft("Use profiles", settings.UseProfiles);
+        if (settings.UseProfiles)
+            settings.MaximumNumberOfProfiles = EditorGUILayout.IntField("Maximum number of profiles", settings.MaximumNumberOfProfiles);
 
         if (GUI.changed)
         {
