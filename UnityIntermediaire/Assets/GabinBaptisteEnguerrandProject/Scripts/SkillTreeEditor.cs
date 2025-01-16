@@ -28,7 +28,7 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             skillTree.number = EditorGUILayout.IntField("Number of the leaf you want test", skillTree.number);
             skillTree.isLocked = EditorGUILayout.Toggle("Is locked", skillTree.isLocked);
 
-            if (GUILayout.Button("Generate Skill Tree"))
+            if (GUILayout.Button("Add leaf"))
             {
                 oldLeaf = skillTree.AddLeaf(skillTree.nameText, skillTree.price, skillTree.isLocked, skillTree.position,
                     0, oldLeaf);
@@ -36,13 +36,18 @@ namespace GabinBaptisteEnguerrandProject.Scripts
 
             if (GUILayout.Button("Remove Leaf"))
             {
-                skillTree.ClearLeaf();
+                skillTree.RemoveLastLeaf();
             }
 
             if (GUILayout.Button("UnlockLeaf"))
             {
-                skillTree.UnlockLeaf(skillTree.number);
+                skillTree.UnlockLeaf(skillTree.number,skillTree.price);
             }
+            if (GUILayout.Button("Clear Leaf"))
+            {
+                skillTree.ClearLeaf();
+            }
+
             serializedObject.ApplyModifiedProperties();
         }
     }
