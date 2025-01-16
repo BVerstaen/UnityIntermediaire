@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -25,7 +27,6 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
 
     private Vector2 _initPos;
     private Vector2 _mousePos;
-    private Camera _cam;
     private Coroutine _dragUpdateCoroutine;
     private PointerEventData _UImousPos;
 
@@ -37,6 +38,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
 
     void Start()
     {
+        _mousePos = Input.mousePosition;
         _clickToDrag.action.performed += OnHold;
         _clickToDrag.action.canceled += OnReleased;
     }
@@ -52,13 +54,18 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         switch (mode)
         {
             case _mode.Game:
-                if (_isDragable)
+        
+                if ( _isDragable)
+                {
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
+                }
                 break;
             case _mode.UI:
-                Debug.Log("test");
-                if (_isDragable)
+                //Debug.Log("test");
+                if (  _isDragable)
+                {
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
+                }
                 break;
         }
     }
@@ -68,19 +75,23 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         switch (mode)
         {
             case _mode.Game:
-                var hit = Physics2D.OverlapBox(_target.transform.position, _target.transform.localScale, 0, _mask);
+                //check if obj position is valid or not
+                var hit = Physics2D.OverlapBox(_target.transform.position, _target.transform.localScale, 0);
 
-                if (hit != null)
+                if (hit.tag != "InvalidPlacement")
                 {
-                    //if (LayerMask.GetMask(_mask))
                     _isDragable = false;
                     _target.transform.position = _initPos;
                     Debug.Log("Placement impossible");
                 }
                 else
+                {
                     _target.transform.position = _mousePos;
+                    _isDragable = true;
+                }
                 break;
             case _mode.UI:
+                //check if obj is under
                 GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
                 List<RaycastResult> results = new List<RaycastResult>();
                 foreach(RaycastResult result in results)
@@ -92,14 +103,16 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                         Debug.Log("Placement impossible");
                     }
                     else
+                    {
                         _target.transform.position = _mousePos;
+                        _isDragable = true;
+                    }
                 }
-                
-            break;
+
+                break;
         }
 
         StopAllCoroutines();
-        _isDragable = true;
     }
 
     IEnumerator DragUpdate()
@@ -129,6 +142,19 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        //FindTarget(Input.mousePosition, out _target);
         _target = eventData.pointerEnter;
     }
+
+    /*private void FindTarget()
+    {
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(_mousePos);
+        RaycastHit2D hitInfo = Physics2D.Raycast(mousePos, Vector2.zero);
+        if(hitInfo.collider != null)
+        {
+            ObjectInteraction script = hitInfo.collider.GetComponent<ObjectInteraction>();
+            if (script == null)
+                return;
+        }
+    }*/
 }
