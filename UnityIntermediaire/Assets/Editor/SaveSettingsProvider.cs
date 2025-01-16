@@ -45,7 +45,14 @@ public class SaveSettingsProvider : SettingsProvider
         //Delete everything in save folder
         if (GUILayout.Button("Erase All save files"))
         {
-            Directory.Delete(Application.persistentDataPath, true);
+            string SaveFolder = Application.persistentDataPath + "/" + settings.FolderName;
+            string ProfileFolder = Application.persistentDataPath + "/" + settings.ProfileFolderName;
+            
+            if (Directory.Exists(SaveFolder))
+                Directory.Delete(SaveFolder, true);
+
+            if (Directory.Exists(ProfileFolder))
+                Directory.Delete(ProfileFolder, true);
         }
 
         //Create Editor Settings
@@ -54,11 +61,11 @@ public class SaveSettingsProvider : SettingsProvider
 
         //Show binary extension if binary format is selected
         if(settings.FileFormat == FileFormats.BINARY)
-            settings.FileFormatExtension = EditorGUILayout.TextField("File Extension :", settings.FileFormatExtension);
+            settings.FileFormatExtension = EditorGUILayout.TextField("File extension :", settings.FileFormatExtension);
         
         //Don't show default folder name if using profiles is selected
         if (!settings.UseProfiles)
-            settings.FolderName = EditorGUILayout.TextField("Folder Name", settings.FolderName);
+            settings.FolderName = EditorGUILayout.TextField("Folder name", settings.FolderName);
         
         EditorGUILayout.Space();
         
@@ -67,7 +74,10 @@ public class SaveSettingsProvider : SettingsProvider
         settings.UseProfiles = EditorGUILayout.ToggleLeft("Use profiles", settings.UseProfiles);
         //Show maximum number of profiles if use profiles
         if (settings.UseProfiles)
+        {
             settings.MaximumNumberOfProfiles = EditorGUILayout.IntField("Maximum number of profiles", settings.MaximumNumberOfProfiles);
+            settings.ProfileFolderName = EditorGUILayout.TextField("Profile folder name :", settings.ProfileFolderName);
+        }
 
         if (GUI.changed)
         {

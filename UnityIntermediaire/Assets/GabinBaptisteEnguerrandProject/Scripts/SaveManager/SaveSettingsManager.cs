@@ -10,7 +10,7 @@ public static class SaveSettingsManager
     public static string GetFolderName()
     {
         SaveSettings currentSaveSettings = GetCurrentSavesSettings();
-        return currentSaveSettings.UseProfiles ? currentSaveSettings.SelectedFolderName : GetCurrentSavesSettings().FolderName;
+        return currentSaveSettings.UseProfiles ? currentSaveSettings.ProfileFolderName + "/" + currentSaveSettings.SelectedFolderName : GetCurrentSavesSettings().FolderName;
     }
 
     public static FileFormats GetFileFormat()
@@ -40,6 +40,11 @@ public static class SaveSettingsManager
     public static int GetMaximumNumberOfProfiles()
     {
         return GetCurrentSavesSettings().MaximumNumberOfProfiles;
+    }
+
+    public static string GetProfileFolderName()
+    {
+        return GetCurrentSavesSettings().ProfileFolderName;
     }
 
     public static void ChangeProfileFolderName(string newFolderName)

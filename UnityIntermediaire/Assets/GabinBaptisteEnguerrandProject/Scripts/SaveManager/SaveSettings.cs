@@ -11,7 +11,8 @@ public class SaveSettings : ScriptableObject
 
     public bool UseProfiles;
     public int MaximumNumberOfProfiles;
-
+    public string ProfileFolderName = "Profiles";
+    
     public string SelectedFolderName = "";
 }
 

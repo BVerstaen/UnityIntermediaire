@@ -10,7 +10,7 @@ public class ProfileUI : MonoBehaviour
     [SerializeField] InputField _exampleInputField;
     [SerializeField] Dropdown _exampleDropdown;
 
-    private void Awake()
+    private void Start()
     {
         if (!SaveSettingsManager.UseProfiles())
         {
@@ -45,12 +45,14 @@ public class ProfileUI : MonoBehaviour
             Debug.LogError("No linked input field");
             return;
         }
-        
 
-        ProfileManager.CreateProfile(_exampleInputField.text);
-        ProfileManager.ChangeProfile(_exampleInputField.text);
+        string newProfileName = _exampleInputField.text;
+
+        ProfileManager.CreateProfile(newProfileName);
+        ProfileManager.ChangeProfile(newProfileName);
 
         RefreshProfileDropDown();
+        _exampleDropdown.value = _exampleDropdown.options.FindIndex((i) => { return i.text.Equals(newProfileName); });
 
         if(_savePanelManager != null)
             _savePanelManager.RefreshAndCreateSavePanels();
@@ -77,6 +79,10 @@ public class ProfileUI : MonoBehaviour
     {
         ProfileManager.EraseProfile(ProfileManager.GetCurrentProfile());
         RefreshProfileDropDown();
+
+        //Change to the first profile
+        if(_exampleDropdown.options.Count > 0)
+            ProfileManager.ChangeProfile(_exampleDropdown.options[0].text);
 
         if (_savePanelManager != null)
             _savePanelManager.RefreshAndCreateSavePanels();

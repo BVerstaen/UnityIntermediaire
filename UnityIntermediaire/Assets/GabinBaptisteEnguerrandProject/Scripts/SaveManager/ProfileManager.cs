@@ -7,7 +7,7 @@ public class ProfileManager : MonoBehaviour
 {
     public static void CreateProfile(string profileName)
     {
-        string path = Application.persistentDataPath + "/" + profileName;
+        string path = Application.persistentDataPath + "/" + SaveSettingsManager.GetProfileFolderName() + "/" + profileName;
 
         if (Directory.Exists(path))
         {
@@ -15,7 +15,7 @@ public class ProfileManager : MonoBehaviour
             return;
         }
 
-        if (SaveSettingsManager.GetMaximumNumberOfProfiles() <= Directory.GetDirectories(Application.persistentDataPath).Length)
+        if (SaveSettingsManager.GetMaximumNumberOfProfiles() <= Directory.GetDirectories(Application.persistentDataPath + "/" + SaveSettingsManager.GetProfileFolderName()).Length)
         {
             Debug.LogWarning("Maximum number of profiles reached !");
             return;
@@ -26,7 +26,7 @@ public class ProfileManager : MonoBehaviour
 
     public static void EraseProfile(string profileName)
     {
-        string path = Application.persistentDataPath + "/" + profileName;
+        string path = Application.persistentDataPath + "/" + profileName + "/";
 
         if (!Directory.Exists(path))
         {
@@ -42,7 +42,7 @@ public class ProfileManager : MonoBehaviour
 
     public static void ChangeProfile(string newProfileName)
     {
-        string path = Application.persistentDataPath + "/" + newProfileName;
+        string path = Application.persistentDataPath + "/" + SaveSettingsManager.GetProfileFolderName() + "/" + newProfileName;
 
         if (!Directory.Exists(path))
         {
@@ -59,6 +59,6 @@ public class ProfileManager : MonoBehaviour
 
     public static string[] GetEveryProfiles()
     {
-        return Directory.GetDirectories(Application.persistentDataPath);
+        return Directory.GetDirectories(Application.persistentDataPath + "/" + SaveSettingsManager.GetProfileFolderName());
     }
 }
