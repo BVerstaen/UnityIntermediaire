@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -169,17 +170,19 @@ public class SavePanelManager : MonoBehaviour
     //Buttons functions
     public void CreateSaveFromComponent(Component _saveObject)
     {
-        //Check if reach maximum number of saves files
-        if(_maxNumberOfSaves <= _savePanels.Count)
+        //Change save name if use save name field
+        string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
+        if(_saveNameField != null)
+            saveName = _saveNameField.text;
+
+
+        //Check if reach maximum number of saves files and if creating new file
+        if(_maxNumberOfSaves <= _savePanels.Count && !DoesSaveAlreadyExist(saveName))
         {
             Debug.LogWarning("Maximum number of saves reached !");
             return;
         }
 
-        //Change save name if use save name field
-        string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
-        if(_saveNameField != null)
-            saveName = _saveNameField.text;
         
         string _savedata = JsonUtility.ToJson(_saveObject);
 
@@ -225,5 +228,12 @@ public class SavePanelManager : MonoBehaviour
         }
 
         RefreshAndCreateSavePanels();
+    }
+
+    private bool DoesSaveAlreadyExist(string saveName)
+    {
+        string path = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + "." + SaveSettingsManager.GetFileFormatExtension();
+
+        return File.Exists(path);
     }
 }

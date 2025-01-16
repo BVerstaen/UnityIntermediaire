@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FileFormat: 0
   FileFormatExtension: bin
-  FolderName: Saves
+  FolderName: Save
+  UseProfiles: 1
+  MaximumNumberOfProfiles: 4
+  SelectedFolderName: 
