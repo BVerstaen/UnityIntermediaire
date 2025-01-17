@@ -390,7 +390,7 @@ GameObject:
   - component: {fileID: 462913421}
   m_Layer: 0
   m_Name: Panel
-  m_TagString: InvalidPlacement
+  m_TagString: Valid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -466,7 +466,7 @@ GameObject:
   - component: {fileID: 745455140}
   m_Layer: 0
   m_Name: Dragcard
-  m_TagString: Untagged
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -548,6 +548,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   mode: 1
+  _eventSystem: {fileID: 364237691}
 --- !u!1 &918594863
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,6 +983,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   mode: 0
+  _eventSystem: {fileID: 0}
 --- !u!1 &1877026548
 GameObject:
   m_ObjectHideFlags: 0
@@ -1014,8 +1016,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 462913420}
-  - {fileID: 745455136}
   - {fileID: 2049757735}
+  - {fileID: 745455136}
   m_Father: {fileID: 1459908822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
