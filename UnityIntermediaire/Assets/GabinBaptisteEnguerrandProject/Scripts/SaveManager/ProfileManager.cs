@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class ProfileManager : MonoBehaviour
+public static class ProfileManager
 {
     public static void CreateProfile(string profileName)
     {

@@ -17,6 +17,12 @@ Le script Save Manager peut sauvegarder n'importe quel type T pouvant être sauv
 		
 	- T LoadData<T>(string saveName)
 
+	-SaveListOfSerializableClass<T>(List<T> dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
+		Permet de sauvegarder une liste de class sérialisable
+
+	-List<SaveFileData<T>> GetEverySaveFile<T>()
+		Permet de charger une liste de class sérialisable 
+
 Le prefab SavePanelManager permet de fournir une liste de sauvegardes avec :
 	-Nombre de sauvegardes maximum
 	-L'image montrée et créée si l'on utilise la fonction "CreateSaveFromComponent" du component "SavePanelManager.cs" (rien, une image, une image aléatoire parmi une liste, une capture d'écran)

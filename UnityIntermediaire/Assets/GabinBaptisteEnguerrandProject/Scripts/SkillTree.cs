@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GabinBaptisteEnguerrandProject.Scripts
@@ -119,15 +119,24 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         }
         public void LoadTree()
         {
-            foreach (Leaf leaff in _leaves)
+            List<LeafData> leafDataList = SaveManager.LoadListOfSerializableClass<LeafData>("SaveSkillTree");
+
+            foreach (LeafData leafData in leafDataList)
             {
-                InstantiateLeaves.Add(Instantiate(leaff, leaff._position,
-                    Quaternion.identity));
+                GameObject newLeaf = Instantiate(leafPrefab, leaf._position, Quaternion.identity);
+                newLeaf.GetComponent<Leaf>()._data = leafData;
+                InstantiateLeaves.Add(newLeaf.GetComponent<Leaf>());
             }
         }
         public void Save()
         {
-            //Baptiste script
+            List<LeafData> DataLeaf = new List<LeafData>();
+            foreach (var leaf in InstantiateLeaves)
+            {
+                DataLeaf.Add(leaf._data);
+            }
+            
+            SaveManager.SaveListOfSerializableClass<LeafData>(DataLeaf, "SaveSkillTree", null, true);
         }
 
         private void Update()
@@ -136,3 +145,4 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         }
     }
 }
+
