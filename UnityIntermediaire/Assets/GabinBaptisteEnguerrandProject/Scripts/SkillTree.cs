@@ -119,11 +119,8 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         }
         public void LoadTree()
         {
-            string leavesListInJson = SaveManager.LoadData<string>("Save");
-            Wrapper<LeafData> loadedLeadData = new Wrapper<LeafData>();
-            JsonUtility.FromJsonOverwrite(leavesListInJson, loadedLeadData);
+            List<LeafData> leafDataList = SaveManager.LoadListOfSerializableClass<LeafData>("SaveSkillTree");
 
-            List<LeafData> leafDataList = loadedLeadData.Items;
             foreach (LeafData leafData in leafDataList)
             {
                 GameObject newLeaf = Instantiate(leafPrefab, leaf._position, Quaternion.identity);
@@ -138,21 +135,14 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             {
                 DataLeaf.Add(leaf._data);
             }
-            string json = JsonUtility.ToJson(new Wrapper<LeafData> { Items = DataLeaf }, true);
-
-            SaveManager.SaveData<string>(json, "Save", null, true);
+            
+            SaveManager.SaveListOfSerializableClass<LeafData>(DataLeaf, "SaveSkillTree", null, true);
         }
 
         private void Update()
         {
             printLineRenderer();
         }
-    }
-
-    [System.Serializable]
-    public class Wrapper<T>
-    {
-        public List<T> Items;
     }
 }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -28,19 +29,31 @@ public static class SaveManager
         }
     }
 
+    [System.Serializable]
+    public class SaveWrapper<T>
+    {
+        public List<T> Items;
+    }
+
     private static string GetSaveFilePath(string saveName, bool withExtension = true)
     {
         return Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + (withExtension ? "." + SaveSettingsManager.GetFileFormatExtension() : "");
     }
 
+    //Save data functions
+
     public static void SaveData<T>(T dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
+        //Check if try to save a monobehaviour class
+        if (DoesDerivesFromMonobehaviour<T>())
+            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
+
         //Create save file data & get save path
         string path = GetSaveFilePath(saveName);
         SaveFileData<T> SaveFile = new SaveFileData<T>(dataToSave, saveName, fileImage);
 
         //Notify that corresponding image exist if take screenshot instead
-        if(fileImage == null)
+        if (fileImage == null)
             SaveFile.hasCorrespondingImage = takeScreenShot;
 
         //If using profiles, then check if there's a valid profile
@@ -61,7 +74,7 @@ public static class SaveManager
         }
 
         switch (SaveSettingsManager.GetFileFormat())
-        { 
+        {
             //Save to .JSON
             case FileFormats.JSON:
                 string SaveDataJSON = JsonUtility.ToJson(SaveFile);
@@ -74,7 +87,7 @@ public static class SaveManager
                 FileStream stream = new FileStream(path, FileMode.Create);
 
                 formatter.Serialize(stream, SaveFile);
-                
+
                 stream.Close();
 
                 Debug.Log("Save Complete !");
@@ -136,6 +149,21 @@ public static class SaveManager
         }
 
     }
+
+    public static void SaveListOfSerializableClass<T>(List<T> dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
+    {
+        //Preventive checks to be sure it's serilazable that doesn't derive from Monobehaviour
+        if (!IsSerializableType<T>())
+            throw new Exception("Type " + typeof(T).FullName + " is not marked as Serializable, therefore properties can't be saved !");
+
+        if (DoesDerivesFromMonobehaviour<T>())
+            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
+
+        string json = JsonUtility.ToJson(new SaveWrapper<T> { Items = dataToSave}, true);
+        SaveManager.SaveData<string>(json, saveName, null, true);
+    }
+
+    //Fetch data functions
 
     public static List<SaveFileData<T>> GetEverySaveFile<T>()
     {
@@ -200,6 +228,8 @@ public static class SaveManager
         }
     }
 
+    //Load functions
+
     public static T LoadData<T>(string saveName)
     {
         SaveFileData<T> dataToLoad = GetSaveFileData<T>(saveName + "." + SaveSettingsManager.GetFileFormatExtension());
@@ -211,6 +241,17 @@ public static class SaveManager
 
         return dataToLoad.Data;
     }
+
+    public static List<T> LoadListOfSerializableClass<T>(string saveName)
+    {
+        string ListInJson = SaveManager.LoadData<string>(saveName);
+        SaveWrapper<T> LoadedData = new SaveWrapper<T>();
+        JsonUtility.FromJsonOverwrite(ListInJson, LoadedData);
+
+        return LoadedData.Items;
+    }
+
+    //Delete functions
 
     public static void DeleteSave(string saveName)
     {
@@ -228,5 +269,16 @@ public static class SaveManager
         string correspondingImagePath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + ".png";
         if (File.Exists(correspondingImagePath))
             File.Delete(correspondingImagePath);
+    }
+
+    //Check functions
+
+    public static bool DoesDerivesFromMonobehaviour<T>()
+    {
+        return typeof(MonoBehaviour).IsAssignableFrom(typeof(T));
+    }
+    public static bool IsSerializableType<T>()
+    {
+        return typeof(T).IsSerializable || typeof(ISerializable).IsAssignableFrom(typeof(T));
     }
 }
