@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - InvalidPlacement
+  - Card
+  - Valid
   layers:
   - Default
   - TransparentFX

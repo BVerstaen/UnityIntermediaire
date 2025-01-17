@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static UnityEngine.UI.CanvasScaler;
 
 //------Require section------//
 //[RequireComponent(typeof(InputActionReference))]
@@ -19,6 +20,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     [SerializeField] InputActionReference _clickToDrag;
     [SerializeField] GameObject _target;
     [SerializeField] Collider2D _coll;
+    public EventSystem _eventSystem;
 
     [Header("Parameters")]
     [SerializeField] bool _isDragable = true;
@@ -54,16 +56,18 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         switch (mode)
         {
             case _mode.Game:
-        
-                if ( _isDragable)
+
+                if (_isDragable)
                 {
+                    _initPos = Input.mousePosition;
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 }
                 break;
             case _mode.UI:
-                //Debug.Log("test");
-                if (  _isDragable)
+                if (IsTarget() && _isDragable)
                 {
+                    _initPos = Input.mousePosition;
+                    //Debug.Log("test");
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 }
                 break;
@@ -77,7 +81,6 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
             case _mode.Game:
                 //check if obj position is valid or not
                 var hit = Physics2D.OverlapBox(_target.transform.position, _target.transform.localScale, 0);
-
                 if (hit.tag != "InvalidPlacement")
                 {
                     _isDragable = false;
@@ -94,7 +97,10 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                 //check if obj is under
                 GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
                 List<RaycastResult> results = new List<RaycastResult>();
-                foreach(RaycastResult result in results)
+                _UImousPos = new PointerEventData(_eventSystem);
+                _UImousPos.position = Input.mousePosition;
+                UIhit.Raycast(_UImousPos, results);
+                foreach (RaycastResult result in results)
                 {
                     if (result.gameObject.CompareTag("InvalidPlacement"))
                     {
@@ -104,20 +110,17 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                     }
                     else
                     {
-                        _target.transform.position = _mousePos;
                         _isDragable = true;
                     }
                 }
-
                 break;
         }
-
         StopAllCoroutines();
     }
 
     IEnumerator DragUpdate()
     {
-        while (_isDragable) 
+        while (_isDragable)
         {
             switch (mode)
             {
@@ -127,34 +130,47 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                     _target.transform.position = _mousePos;
                     break;
                 case _mode.UI:
+
                     var uiMousePos = Input.mousePosition;
                     var pos = new Vector2(Screen.width, Screen.height);
-                    var newMousePos = Camera.main.ScreenToViewportPoint(uiMousePos)* pos;
-                    newMousePos -= pos / 2;
-                    _target.GetComponent<RectTransform>().localPosition = newMousePos;
-                    //Debug.Log("tes la chakal");
+                    var newMousePos = Camera.main.ScreenToViewportPoint(uiMousePos) * pos;
+                   // newMousePos -= pos / 2;
+                    _mousePos = newMousePos;
+                    _target.transform.position = _mousePos;
                     break;
             }
-            
             yield return null;
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //FindTarget(Input.mousePosition, out _target);
         _target = eventData.pointerEnter;
     }
 
-    /*private void FindTarget()
+    private bool IsTarget()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(_mousePos);
-        RaycastHit2D hitInfo = Physics2D.Raycast(mousePos, Vector2.zero);
-        if(hitInfo.collider != null)
+        switch (mode)
         {
-            ObjectInteraction script = hitInfo.collider.GetComponent<ObjectInteraction>();
-            if (script == null)
-                return;
+            case _mode.Game:
+                var hit = Physics2D.OverlapBox(Input.mousePosition, , 0);
+
+                break;
+            case _mode.UI:
+                GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
+                List<RaycastResult> results = new List<RaycastResult>();
+                _UImousPos = new PointerEventData(_eventSystem);
+                _UImousPos.position = Input.mousePosition;
+                UIhit.Raycast(_UImousPos, results);
+
+                foreach (var result in results)
+                {
+                    if (result.gameObject.GetComponent<ObjectInteraction>() == this)
+                        return true;
+                }
+                break;
         }
-    }*/
+        return false;
+    }
 }
+
