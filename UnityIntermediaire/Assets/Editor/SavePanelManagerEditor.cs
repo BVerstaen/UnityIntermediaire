@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using Unity.VisualScripting.YamlDotNet.Serialization;
 
 [CustomEditor(typeof(SavePanelManager))]
 public class SavePanelManagerEditor : Editor
 {
     SerializedProperty _savePanelPrefab;
+    SerializedProperty _gameObjectToSave;
     
     SerializedProperty _maxNumberOfSaves;
     SerializedProperty _panelImage;
@@ -28,6 +26,7 @@ public class SavePanelManagerEditor : Editor
     private void OnEnable()
     {
         _savePanelPrefab = serializedObject.FindProperty("_savePanelPrefab");
+        _gameObjectToSave = serializedObject.FindProperty("_gameObjectToSave");
         
         _maxNumberOfSaves = serializedObject.FindProperty("_maxNumberOfSaves");
         _panelImage = serializedObject.FindProperty("_panelImage");
@@ -50,6 +49,43 @@ public class SavePanelManagerEditor : Editor
         serializedObject.Update();
 
         EditorGUILayout.PropertyField(_savePanelPrefab);
+        EditorGUILayout.Space(10);
+
+
+        GUILayout.Box("", GUILayout.Height(5), GUILayout.ExpandWidth(true)); // Ligne horizontale
+
+        EditorGUILayout.LabelField("GameObject to save :");
+        EditorGUILayout.PropertyField(_gameObjectToSave);
+        EditorGUILayout.Space(10);
+
+        GameObject SelectedGameObject = _gameObjectToSave.objectReferenceValue as GameObject;
+        if(SelectedGameObject != null)
+        {
+            Component[] components = SelectedGameObject.GetComponents(typeof(Component));
+            SavePanelManager savePanelManager = target as SavePanelManager;
+
+            // Affiche tous les composants disponibles
+            if (components.Length > 0)
+            {
+                EditorGUILayout.LabelField("Available Components:");
+
+                foreach (Component component in components)
+                {
+                    if (GUILayout.Button(component.GetType().Name))
+                    {
+                        // Assigner le composant sélectionné
+                        savePanelManager.ComponentToSave = component;
+                        EditorUtility.SetDirty(savePanelManager);
+                    }
+                }
+            }
+
+            // Affiche la variable sélectionnée
+            EditorGUILayout.LabelField("Selected Component:");
+            EditorGUILayout.ObjectField(savePanelManager.ComponentToSave, typeof(Component), true);
+        }
+
+        GUILayout.Box("", GUILayout.Height(5), GUILayout.ExpandWidth(true)); // Ligne horizontale
 
         EditorGUILayout.PropertyField(_maxNumberOfSaves);
         EditorGUILayout.PropertyField(_panelImage);
@@ -85,5 +121,20 @@ public class SavePanelManagerEditor : Editor
         EditorGUILayout.PropertyField(_onMaxNumberOfSavesReached);
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    public class ComponentSelector : MonoBehaviour
+    {
+        public Component SelectedComponent; // La variable où sera assignée la sélection
+
+        // Exemple : Récupère tous les composants de type MonoBehaviour attachés à cet objet
+        public void FetchComponents()
+        {
+            AvailableComponents = GetComponents<MonoBehaviour>();
+        }
+
+        // Liste des composants disponibles
+        [HideInInspector] // Cacher dans l'inspecteur, géré par l'éditeur
+        public Component[] AvailableComponents;
     }
 }

@@ -25,7 +25,11 @@ public class SavePanelManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] GameObject _savePanelPrefab;
-
+    [SerializeField] GameObject _gameObjectToSave;
+    
+    [HideInInspector]
+    public Component ComponentToSave = null;
+    
     [Header("Save parameters")]
     [SerializeField] int _maxNumberOfSaves;
     [SerializeField] PanelImageType _panelImage;
@@ -168,7 +172,7 @@ public class SavePanelManager : MonoBehaviour
     }
 
     //Buttons functions
-    public void CreateSaveFromComponent(Component _saveObject)
+    public void CreateSaveFromComponent()
     {
         //Change save name if use save name field
         string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
@@ -184,7 +188,7 @@ public class SavePanelManager : MonoBehaviour
         }
 
         
-        string _savedata = JsonUtility.ToJson(_saveObject);
+        string _savedata = JsonUtility.ToJson(ComponentToSave);
 
         Texture2D savePanelImage = null;
         bool takeScreenShot = false;
