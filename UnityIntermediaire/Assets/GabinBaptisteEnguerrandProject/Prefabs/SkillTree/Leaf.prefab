@@ -50,8 +50,8 @@ MonoBehaviour:
   _name: Water
   _price: 100
   _isLocked: 1
-  _position: {x: 3, y: 6}
-  _number: 3
+  _position: {x: 3, y: 3}
+  _number: 2
   _previousLeaf: {fileID: 0}
 --- !u!23 &3039683765032118587
 MeshRenderer:

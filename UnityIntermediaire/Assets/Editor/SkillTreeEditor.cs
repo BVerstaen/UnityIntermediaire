@@ -43,9 +43,22 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             {
                 skillTree.UnlockLeaf(skillTree.number,skillTree.price);
             }
+
             if (GUILayout.Button("Clear Leaf"))
             {
                 skillTree.ClearLeaf();
+            }
+
+            GUILayout.Space(25);
+
+            if (GUILayout.Button("Save leaves"))
+            {
+                skillTree.Save();
+            }
+
+            if (GUILayout.Button("Load leaves"))
+            {
+                skillTree.LoadTree();
             }
 
             serializedObject.ApplyModifiedProperties();
