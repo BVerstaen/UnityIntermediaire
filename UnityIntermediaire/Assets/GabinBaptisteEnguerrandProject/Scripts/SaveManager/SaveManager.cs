@@ -45,8 +45,7 @@ public static class SaveManager
     public static void SaveData<T>(T dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
         //Check if try to save a monobehaviour class
-        if (DoesDerivesFromMonobehaviour<T>())
-            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
+        CheckIfTypeIsValidForSave<T>();
 
         //Create save file data & get save path
         string path = GetSaveFilePath(saveName);
@@ -152,12 +151,7 @@ public static class SaveManager
 
     public static void SaveListOfSerializableClass<T>(List<T> dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
-        //Preventive checks to be sure it's serilazable that doesn't derive from Monobehaviour
-        if (!IsSerializableType<T>())
-            throw new Exception("Type " + typeof(T).FullName + " is not marked as Serializable, therefore properties can't be saved !");
-
-        if (DoesDerivesFromMonobehaviour<T>())
-            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
+        CheckIfTypeIsValidForSave<T>();
 
         string json = JsonUtility.ToJson(new SaveWrapper<T> { Items = dataToSave}, true);
         SaveManager.SaveData<string>(json, saveName, null, true);
@@ -273,12 +267,22 @@ public static class SaveManager
 
     //Check functions
 
-    public static bool DoesDerivesFromMonobehaviour<T>()
+    private static bool DoesDerivesFromMonobehaviour<T>()
     {
         return typeof(MonoBehaviour).IsAssignableFrom(typeof(T));
     }
-    public static bool IsSerializableType<T>()
+    private static bool IsSerializableType<T>()
     {
         return typeof(T).IsSerializable || typeof(ISerializable).IsAssignableFrom(typeof(T));
+    }
+
+    private static void CheckIfTypeIsValidForSave<T>()
+    {
+        //Preventive checks to be sure it's serilazable that doesn't derive from Monobehaviour
+        if (!IsSerializableType<T>())
+            throw new Exception("Type " + typeof(T).FullName + " is not marked as Serializable, therefore properties can't be saved !");
+
+        if (DoesDerivesFromMonobehaviour<T>())
+            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
     }
 }
