@@ -28,8 +28,5 @@ public class TestSaveScript : MonoBehaviour
         _InputField.text = _saveContenerComponent.InputText;
     }
 
-    public void SaveValues()
-    {
-        _savePanelManager.CreateSaveFromComponent(_saveContenerComponent);
-    }
+    public void SaveValues() => _savePanelManager.CreateSaveFromComponent();
 }
