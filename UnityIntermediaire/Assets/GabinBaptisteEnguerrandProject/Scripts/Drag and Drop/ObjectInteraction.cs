@@ -1,15 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static UnityEditor.PlayerSettings;
-using static UnityEditor.Progress;
-using static UnityEngine.UI.CanvasScaler;
 
 //------Require section------//
 //[RequireComponent(typeof(InputActionReference))]
@@ -64,8 +58,9 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
 
                 if (IsTarget() && _isDragable)
                 {
-                    var newMousePos = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+                    var newMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     _initPos = newMousePos;
+
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 }
                 break;
@@ -86,10 +81,12 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         {
             case _mode.Game:
                 //check if obj position is valid or not
-                if (!invalidator)
+                if (invalidator)
                 {
-                    _isDragable = false;
-                    _target.transform.position = _initPos;
+                    _isDragable = true;
+                    Vector3 defaultPos = _initPos;
+                    defaultPos.z = _target.transform.position.z;
+                    _target.transform.position = defaultPos;
                     Debug.Log("Placement impossible");
                 }
                 else
@@ -134,8 +131,8 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                     _mousePosGame.z = _target.transform.position.z;
                     _target.transform.position = _mousePosGame;
                     break;
-                case _mode.UI:
 
+                case _mode.UI:
                     var uiMousePos = Input.mousePosition;
                     var pos = new Vector2(Screen.width, Screen.height);
                     var newMousePos = Camera.main.ScreenToViewportPoint(uiMousePos) * pos;
@@ -163,12 +160,14 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                 Debug.DrawRay(newMousePos, Vector3.forward * 200, Color.red, 2000f);
                 if (Physics.Raycast(newMousePos, Vector3.forward * 200, out hit, Mathf.Infinity))
                 {
-                    print("touché");
                     if(hit.collider.CompareTag("Card"))
+                    {
+                        print("touché");
                         return true;
+                    }
                 }
-
                 break;
+
             case _mode.UI:
                 GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
                 List<RaycastResult> results = new List<RaycastResult>();
@@ -191,7 +190,16 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         if (collision.gameObject.CompareTag("InvalidPlacement"))
         {
             invalidator = true;
-            print("ça marche");
+            //print("enter");
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("InvalidPlacement"))
+        {
+            invalidator = false;
+            //print("exit");
         }
     }
 }
