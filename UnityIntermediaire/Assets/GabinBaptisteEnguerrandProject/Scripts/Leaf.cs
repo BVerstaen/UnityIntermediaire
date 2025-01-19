@@ -54,6 +54,18 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             }
         }
 
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.GetComponent<ObjectInteraction>() != null)
+            {
+                var interaction = other.GetComponent<ObjectInteraction>();
+                if (interaction._money >= _data._price)
+                {
+                    interaction._money -= _data._price;
+                    UnlockLeaf();
+                }
+            }
+        }
 
         public void UnlockLeaf()
         {
