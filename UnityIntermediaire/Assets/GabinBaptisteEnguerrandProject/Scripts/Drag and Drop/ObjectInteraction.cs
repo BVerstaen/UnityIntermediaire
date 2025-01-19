@@ -1,13 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using static UnityEngine.UI.CanvasScaler;
 
 //------Require section------//
 //[RequireComponent(typeof(InputActionReference))]
@@ -27,8 +23,11 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     [SerializeField] LayerMask _mask;
     [SerializeField] _mode mode;
 
+
+    private bool invalidator = false;
     private Vector2 _initPos;
-    private Vector2 _mousePos;
+    private Vector2 _mousePosUI;
+    private Vector3 _mousePosGame;
     private Coroutine _dragUpdateCoroutine;
     private PointerEventData _UImousPos;
 
@@ -40,7 +39,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
 
     void Start()
     {
-        _mousePos = Input.mousePosition;
+        _mousePosUI = Input.mousePosition;
         _clickToDrag.action.performed += OnHold;
         _clickToDrag.action.canceled += OnReleased;
     }
@@ -57,9 +56,11 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         {
             case _mode.Game:
 
-                if (_isDragable)
+                if (IsTarget() && _isDragable)
                 {
-                    _initPos = Input.mousePosition;
+                    var newMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    _initPos = newMousePos;
+
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 }
                 break;
@@ -80,17 +81,19 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         {
             case _mode.Game:
                 //check if obj position is valid or not
-                var hit = Physics2D.OverlapBox(_target.transform.position, _target.transform.localScale, 0);
-                if (hit.tag != "InvalidPlacement")
+                if (invalidator)
                 {
-                    _isDragable = false;
-                    _target.transform.position = _initPos;
+                    _isDragable = true;
+                    Vector3 defaultPos = _initPos;
+                    defaultPos.z = _target.transform.position.z;
+                    _target.transform.position = defaultPos;
                     Debug.Log("Placement impossible");
                 }
                 else
                 {
-                    _target.transform.position = _mousePos;
                     _isDragable = true;
+                   /* _initPos = _target.transform.position;
+                    Debug.Log("aled");*/
                 }
                 break;
             case _mode.UI:
@@ -109,9 +112,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                         Debug.Log("Placement impossible");
                     }
                     else
-                    {
                         _isDragable = true;
-                    }
                 }
                 break;
         }
@@ -126,17 +127,18 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
             {
                 case _mode.Game:
                     var mousePos = Input.mousePosition;
-                    _mousePos = Camera.main.ScreenToWorldPoint(mousePos);
-                    _target.transform.position = _mousePos;
+                    _mousePosGame = Camera.main.ScreenToWorldPoint(mousePos);
+                    _mousePosGame.z = _target.transform.position.z;
+                    _target.transform.position = _mousePosGame;
                     break;
-                case _mode.UI:
 
+                case _mode.UI:
                     var uiMousePos = Input.mousePosition;
                     var pos = new Vector2(Screen.width, Screen.height);
                     var newMousePos = Camera.main.ScreenToViewportPoint(uiMousePos) * pos;
                    // newMousePos -= pos / 2;
-                    _mousePos = newMousePos;
-                    _target.transform.position = _mousePos;
+                    _mousePosUI = newMousePos;
+                    _target.transform.position = _mousePosUI;
                     break;
             }
             yield return null;
@@ -153,9 +155,19 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         switch (mode)
         {
             case _mode.Game:
-                var hit = Physics2D.OverlapBox(Input.mousePosition, , 0);
-
+                RaycastHit hit;
+                var newMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Debug.DrawRay(newMousePos, Vector3.forward * 200, Color.red, 2000f);
+                if (Physics.Raycast(newMousePos, Vector3.forward * 200, out hit, Mathf.Infinity))
+                {
+                    if(hit.collider.CompareTag("Card"))
+                    {
+                        print("touché");
+                        return true;
+                    }
+                }
                 break;
+
             case _mode.UI:
                 GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
                 List<RaycastResult> results = new List<RaycastResult>();
@@ -171,6 +183,24 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                 break;
         }
         return false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("InvalidPlacement"))
+        {
+            invalidator = true;
+            //print("enter");
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("InvalidPlacement"))
+        {
+            invalidator = false;
+            //print("exit");
+        }
     }
 }
 

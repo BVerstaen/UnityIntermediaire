@@ -22,10 +22,14 @@ public class SavePanelManager : MonoBehaviour
         InvertedVertical
     }
 
-
-    [Header("References")]
     [SerializeField] GameObject _savePanelPrefab;
 
+    [Header("Gameobject to save")]
+    [SerializeField] GameObject _gameObjectToSave;
+    
+    [HideInInspector]
+    public Component ComponentToSave = null;
+    
     [Header("Save parameters")]
     [SerializeField] int _maxNumberOfSaves;
     [SerializeField] PanelImageType _panelImage;
@@ -63,7 +67,11 @@ public class SavePanelManager : MonoBehaviour
 
     private void Start()
     {
-        _newPanelPosition = _savePanelFirstPosition.localPosition;
+        if(_savePanelFirstPosition != null)
+            _newPanelPosition = _savePanelFirstPosition.localPosition;
+        else
+            _newPanelPosition = new Vector2(0, 0);
+
         _savePanels = new List<SavePanel>();
         RefreshAndCreateSavePanels();
     }
@@ -78,7 +86,12 @@ public class SavePanelManager : MonoBehaviour
                 if(panel != null)
                     Destroy(panel.gameObject);
             }
-            _newPanelPosition = _savePanelFirstPosition.localPosition;
+
+            if (_savePanelFirstPosition != null)
+                _newPanelPosition = _savePanelFirstPosition.localPosition;
+            else
+                _newPanelPosition = new Vector2(0, 0);
+
             _savePanels.Clear();
         }
 
@@ -168,7 +181,7 @@ public class SavePanelManager : MonoBehaviour
     }
 
     //Buttons functions
-    public void CreateSaveFromComponent(Component _saveObject)
+    public void CreateSaveFromComponent()
     {
         //Change save name if use save name field
         string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
@@ -184,7 +197,7 @@ public class SavePanelManager : MonoBehaviour
         }
 
         
-        string _savedata = JsonUtility.ToJson(_saveObject);
+        string _savedata = JsonUtility.ToJson(ComponentToSave);
 
         Texture2D savePanelImage = null;
         bool takeScreenShot = false;
