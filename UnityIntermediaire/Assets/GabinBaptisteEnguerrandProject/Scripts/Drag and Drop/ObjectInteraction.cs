@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using GabinBaptisteEnguerrandProject.Scripts;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -22,7 +23,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     [SerializeField] bool _isDragable = true;
     [SerializeField] LayerMask _mask;
     [SerializeField] _mode mode;
-
+    [SerializeField] public int _money;
 
     private bool invalidator = false;
     private Vector2 _initPos;
@@ -30,6 +31,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     private Vector3 _mousePosGame;
     private Coroutine _dragUpdateCoroutine;
     private PointerEventData _UImousPos;
+    
 
     public enum _mode
     {
@@ -162,7 +164,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
                 {
                     if(hit.collider.CompareTag("Card"))
                     {
-                        print("touché");
+                        print("touchï¿½");
                         return true;
                     }
                 }
@@ -190,8 +192,9 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         if (collision.gameObject.CompareTag("InvalidPlacement"))
         {
             invalidator = true;
-            //print("enter");
+            print("enter ici");
         }
+
     }
 
     private void OnCollisionExit(Collision collision)
