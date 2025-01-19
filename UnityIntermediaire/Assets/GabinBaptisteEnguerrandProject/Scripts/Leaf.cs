@@ -53,5 +53,11 @@ namespace GabinBaptisteEnguerrandProject.Scripts
                 _material.color = Color.red;
             }
         }
+
+
+        public void UnlockLeaf()
+        {
+            _data._isLocked = false;
+        }
     }
 }
