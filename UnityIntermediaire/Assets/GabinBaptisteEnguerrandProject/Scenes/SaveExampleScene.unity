@@ -3371,9 +3371,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 292553132}
-        m_TargetAssemblyTypeName: TestSaveScript, Assembly-CSharp
-        m_MethodName: SaveValues
+      - m_Target: {fileID: 1554791660}
+        m_TargetAssemblyTypeName: SavePanelManager, Assembly-CSharp
+        m_MethodName: CreateSaveFromSelectedComponent
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5571,7 +5571,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: _panelImage
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: _saveObject
@@ -5588,7 +5588,7 @@ PrefabInstance:
     - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: _componentToSave
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 292553133}
     - target: {fileID: 2792278908181221556, guid: 36e896e3335f04c419b75396ddf5c593, type: 3}
       propertyPath: _gameObjectToSave
       value: 
