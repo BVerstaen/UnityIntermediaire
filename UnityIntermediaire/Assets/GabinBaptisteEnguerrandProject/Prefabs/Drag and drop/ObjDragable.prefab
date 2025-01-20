@@ -105,7 +105,7 @@ MonoBehaviour:
   _isDragable: 1
   _mask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   mode: 0
   _money: 0
 --- !u!65 &8854741838329616552
