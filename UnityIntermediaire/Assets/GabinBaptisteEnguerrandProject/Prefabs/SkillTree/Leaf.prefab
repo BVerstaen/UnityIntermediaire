@@ -49,11 +49,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _name: dada
-    _price: 100
+    _name: 
+    _price: 1
     _isLocked: 1
-    _position: {x: 6, y: 0}
-    _number: 2
+    _position: {x: 0, y: 3}
+    _number: 1
     _previousLeaf: {fileID: 0}
 --- !u!23 &3039683765032118587
 MeshRenderer:
