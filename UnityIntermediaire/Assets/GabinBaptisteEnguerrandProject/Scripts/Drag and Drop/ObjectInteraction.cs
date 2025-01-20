@@ -9,7 +9,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(GameObject))]
 //[RequireComponent(typeof(Collider2D))]
 
-public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
+public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
 {
     [Header("References")]
     [SerializeField] GameObject _target;
@@ -151,10 +151,10 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+/*    public void OnPointerEnter(PointerEventData eventData)
     {
         _target = eventData.pointerEnter;
-    }
+    }*/
 
     private bool IsTarget()
     {
