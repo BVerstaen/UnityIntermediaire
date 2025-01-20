@@ -28,7 +28,7 @@ public class SavePanelManager : MonoBehaviour
     [SerializeField] GameObject _gameObjectToSave;
     
     [HideInInspector]
-    public Component ComponentToSave = null;
+    public Component _componentToSave = null;
     
     [Header("Save parameters")]
     [SerializeField] int _maxNumberOfSaves;
@@ -181,7 +181,7 @@ public class SavePanelManager : MonoBehaviour
     }
 
     //Buttons functions
-    public void CreateSaveFromComponent()
+    public void CreateSaveFromSelectedComponent()
     {
         //Change save name if use save name field
         string saveName = _defaultSaveName + (_shouldSaveNameAutoIncrement ? _savePanels.Count : "");
@@ -197,7 +197,7 @@ public class SavePanelManager : MonoBehaviour
         }
 
         
-        string _savedata = JsonUtility.ToJson(ComponentToSave);
+        string _savedata = JsonUtility.ToJson(_componentToSave);
 
         Texture2D savePanelImage = null;
         bool takeScreenShot = false;
@@ -225,12 +225,13 @@ public class SavePanelManager : MonoBehaviour
         RefreshAndCreateSavePanels();
     }
     
-    public void LoadSave<T>(object ObjectToSaveTo)
+    public void LoadSaveToSelectedComponent()
     {
         if (_selectedPanel == null) throw new Exception("Missing selected Panel");
+        if (_componentToSave == null) throw new Exception("No compotent to load to");
 
         string _loadedJson = SaveManager.LoadData<string>(_selectedPanel.SaveName);
-        JsonUtility.FromJsonOverwrite(_loadedJson, ObjectToSaveTo);
+        JsonUtility.FromJsonOverwrite(_loadedJson, _componentToSave);
     }
 
     public void EraseSave()

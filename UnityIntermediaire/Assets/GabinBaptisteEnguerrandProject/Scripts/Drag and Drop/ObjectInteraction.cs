@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using GabinBaptisteEnguerrandProject.Scripts;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 //------Require section------//
@@ -11,10 +9,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(GameObject))]
 //[RequireComponent(typeof(Collider2D))]
 
-public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
+public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
 {
     [Header("References")]
-    [SerializeField] InputActionReference _clickToDrag;
     [SerializeField] GameObject _target;
     [SerializeField] Collider2D _coll;
     public EventSystem _eventSystem;
@@ -25,6 +22,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     [SerializeField] _mode mode;
     [SerializeField] public int _money;
 
+    private bool _isPressed = false;
     private bool invalidator = false;
     private Vector2 _initPos;
     private Vector2 _mousePosUI;
@@ -42,17 +40,23 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
     void Start()
     {
         _mousePosUI = Input.mousePosition;
-        _clickToDrag.action.performed += OnHold;
-        _clickToDrag.action.canceled += OnReleased;
     }
 
-    private void OnDestroy()
+    void Update()
     {
-        _clickToDrag.action.performed -= OnHold;
-        _clickToDrag.action.canceled -= OnReleased;
+        if (Input.GetMouseButtonDown(0) && !_isPressed)
+        {
+            _isPressed = true;
+            OnHold();
+        }
+        else if (Input.GetMouseButtonUp(0) && _isPressed)
+        {
+            OnReleased();
+            _isPressed = false;
+        }
     }
 
-    void OnHold(InputAction.CallbackContext ctx)
+    void OnHold()
     {
         switch (mode)
         {
@@ -77,7 +81,7 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         }
     }
 
-    void OnReleased(InputAction.CallbackContext ctx)
+    void OnReleased()
     {
         switch (mode)
         {
@@ -147,10 +151,10 @@ public class ObjectInteraction : MonoBehaviour, IPointerEnterHandler
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+/*    public void OnPointerEnter(PointerEventData eventData)
     {
         _target = eventData.pointerEnter;
-    }
+    }*/
 
     private bool IsTarget()
     {

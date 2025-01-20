@@ -20,13 +20,11 @@ public class TestSaveScript : MonoBehaviour
 
     public void LoadValues()
     {
-        _savePanelManager.LoadSave<TestSaveScript>(_saveContenerComponent);
+        _savePanelManager.LoadSaveToSelectedComponent();
 
         _FloatA.value = _saveContenerComponent.FloatA;
         _FloatB.value = _saveContenerComponent.FloatB;
         _IntA.value = _saveContenerComponent.IntA;
         _InputField.text = _saveContenerComponent.InputText;
     }
-
-    public void SaveValues() => _savePanelManager.CreateSaveFromComponent();
 }

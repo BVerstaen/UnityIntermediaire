@@ -22,7 +22,6 @@ public class SavePanelManagerEditor : Editor
 
     SerializedProperty _onMaxNumberOfSavesReached;
 
-    Color _defaultEditorColor;
     private void OnEnable()
     {
 
@@ -68,8 +67,6 @@ public class SavePanelManagerEditor : Editor
         {
             Component[] components = SelectedGameObject.GetComponents(typeof(Component));
             SavePanelManager savePanelManager = target as SavePanelManager;
-
-            EditorStyles.label.normal.textColor = Color.white;
             
             // Affiche tous les composants disponibles
             if (components.Length > 0)
@@ -81,16 +78,14 @@ public class SavePanelManagerEditor : Editor
                     if (GUILayout.Button(component.GetType().Name))
                     {
                         // Assigner le composant sélectionné
-                        savePanelManager.ComponentToSave = component;
+                        savePanelManager._componentToSave = component;
                         EditorUtility.SetDirty(savePanelManager);
                     }
                 }
             }
             // Affiche la variable sélectionnée
             EditorGUILayout.LabelField("Selected Component:");
-            EditorGUILayout.ObjectField(savePanelManager.ComponentToSave, typeof(Component), true);
-            
-            EditorStyles.label.normal.textColor = _defaultEditorColor;
+            EditorGUILayout.ObjectField(savePanelManager._componentToSave, typeof(Component), true);
         }
 
         GUILayout.Box("", GUILayout.Height(5), GUILayout.ExpandWidth(true)); // Ligne horizontale

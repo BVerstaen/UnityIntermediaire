@@ -44,6 +44,9 @@ public static class SaveManager
 
     public static void SaveData<T>(T dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
+        //Check if try to save a monobehaviour class
+        CheckIfTypeIsValidForSave<T>();
+
         //Create save file data & get save path
         string path = GetSaveFilePath(saveName);
         SaveFileData<T> SaveFile = new SaveFileData<T>(dataToSave, saveName, fileImage);
@@ -148,6 +151,8 @@ public static class SaveManager
 
     public static void SaveListOfSerializableClass<T>(List<T> dataToSave, string saveName, Texture2D fileImage = null, bool takeScreenShot = false)
     {
+        CheckIfTypeIsValidForSave<T>();
+
         string json = JsonUtility.ToJson(new SaveWrapper<T> { Items = dataToSave}, true);
         SaveManager.SaveData<string>(json, saveName, null, true);
     }
@@ -258,5 +263,26 @@ public static class SaveManager
         string correspondingImagePath = Application.persistentDataPath + "/" + SaveSettingsManager.GetFolderName() + "/" + saveName + ".png";
         if (File.Exists(correspondingImagePath))
             File.Delete(correspondingImagePath);
+    }
+
+    //Check functions
+
+    private static bool DoesDerivesFromMonobehaviour<T>()
+    {
+        return typeof(MonoBehaviour).IsAssignableFrom(typeof(T));
+    }
+    private static bool IsSerializableType<T>()
+    {
+        return typeof(T).IsSerializable || typeof(ISerializable).IsAssignableFrom(typeof(T));
+    }
+
+    private static void CheckIfTypeIsValidForSave<T>()
+    {
+        //Preventive checks to be sure it's serilazable that doesn't derive from Monobehaviour
+        if (!IsSerializableType<T>())
+            throw new Exception("Type " + typeof(T).FullName + " is not marked as Serializable, therefore properties can't be saved !");
+
+        if (DoesDerivesFromMonobehaviour<T>())
+            throw new Exception("Type " + typeof(T).FullName + " derives from Monobehaviour, therefore properties can't be saved !");
     }
 }
