@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -73,7 +74,7 @@ public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
             case _mode.UI:
                 if (IsTarget() && _isDragable)
                 {
-                    _initPos = Input.mousePosition;
+                    _initPos = _target.transform.position;
                     //Debug.Log("test");
                     _dragUpdateCoroutine = StartCoroutine(DragUpdate());
                 }
@@ -109,13 +110,25 @@ public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
                 _UImousPos = new PointerEventData(_eventSystem);
                 _UImousPos.position = Input.mousePosition;
                 UIhit.Raycast(_UImousPos, results);
+                bool _findvalidPos = false;
                 foreach (RaycastResult result in results)
                 {
-                    if (result.gameObject.CompareTag("InvalidPlacement"))
+                    Target _Target;
+                    if (result.gameObject.TryGetComponent<Target>(out _Target))
                     {
-                        _isDragable = false;
-                        _target.transform.position = _initPos;
-                        Debug.Log("Placement impossible");
+                        if (_Target._current == Target.placement.Invalid && !_findvalidPos)
+                        {
+                            _isDragable = false;
+                            _target.transform.position = _initPos;
+                            Debug.Log("Placement impossible");
+                        }
+                        if(_Target._current == Target.placement.Docker)
+                        {
+                            _findvalidPos = true;
+                            _isDragable = true;
+                            _target.transform.position = result.gameObject.transform.position;
+                        }
+                        _isDragable = true;
                     }
                     else
                         _isDragable = true;
@@ -164,16 +177,19 @@ public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
                 RaycastHit hit;
                 var newMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 Debug.DrawRay(newMousePos, Vector3.forward * 200, Color.red, 2000f);
-                if (Physics.Raycast(newMousePos, Vector3.forward * 200, out hit, Mathf.Infinity))
+                if (Physics.Raycast(newMousePos, Vector3.forward * 200, out hit, Mathf.Infinity, _mask))
                 {
-                    if(hit.collider.CompareTag("Card"))
+                    Target _collideTarget;
+                    if(hit.collider.gameObject.TryGetComponent<Target>(out _collideTarget))
                     {
-                        print("touch�");
-                        return true;
+                        if(_collideTarget._current == Target.placement.Valid)
+                        {
+                            print("touch�");
+                            return true;
+                        }
                     }
                 }
                 break;
-
             case _mode.UI:
                 GraphicRaycaster UIhit = FindAnyObjectByType<GraphicRaycaster>();
                 List<RaycastResult> results = new List<RaycastResult>();
@@ -193,20 +209,28 @@ public class ObjectInteraction : MonoBehaviour //IPointerEnterHandler
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("InvalidPlacement"))
+        Target _Target;
+        if (collision.gameObject.TryGetComponent<Target>(out _Target))
         {
-            invalidator = true;
-            print("enter ici");
+            if(_Target._current == Target.placement.Invalid)
+            {
+                invalidator = true;
+                print("enter ici");
+            }
         }
 
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("InvalidPlacement"))
+        Target _Target;
+        if (collision.gameObject.TryGetComponent<Target>(out _Target))
         {
-            invalidator = false;
-            //print("exit");
+            if (_Target._current == Target.placement.Invalid)
+            {
+                invalidator = false;
+                print("enter ici");
+            }
         }
     }
 }
