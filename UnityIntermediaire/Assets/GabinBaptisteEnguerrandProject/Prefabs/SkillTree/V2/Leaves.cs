@@ -59,7 +59,7 @@ namespace GabinBaptisteEnguerrandProject.Prefabs.SkillTree.V2
             _branchesInLeaves.Add(_branch);
             _branch.transform.position = _position;
             _instantiatedBranches.Add(Instantiate(_branch, _branch.transform.position, Quaternion.identity));
-            _instantiatedBranches[0].SetupLeaf(this._position, this._price, this._isLocked);
+            _instantiatedBranches[0].SetupLeaf(this._position, this._price, this._isLocked, 5);
             _instantiatedBranches[0].AddLeaf(this);
         }
 

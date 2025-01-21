@@ -7,6 +7,11 @@ using UnityEngine.UIElements;
 
 namespace GabinBaptisteEnguerrandProject.Scripts
 {
+    public static class Globals
+    {
+        public static int nbBranches = 0;
+    }
+
     [CustomEditor(typeof(MasteryTree))]
     public class MasteryTreeEditor : Editor
     {
@@ -23,9 +28,20 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             EditorGUILayout.PropertyField(BranchPrefabProperty, new GUIContent("Branch Prefab"));
 
             MasteryTree masteryTree = (MasteryTree)target;
+            Globals.nbBranches = masteryTree._instantiatedBranches.Count;
             if (GUILayout.Button("Add branch"))
             {
                 masteryTree.AddBranch();
+            }
+
+            if (GUILayout.Button("Save Tree"))
+            {
+                masteryTree.Save();
+            }
+
+            if (GUILayout.Button("Load Tree"))
+            {
+                masteryTree.LoadTree();
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -47,7 +63,7 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             LeafPrefabProperty = serializedObject.FindProperty("LeafPrefab");
         }
 
-        
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -56,9 +72,10 @@ namespace GabinBaptisteEnguerrandProject.Scripts
             branch.position = EditorGUILayout.Vector2Field("Leaf position", branch.position);
             branch.price = EditorGUILayout.IntField("Unlock Price", branch.price);
             branch.isLocked = EditorGUILayout.Toggle("Is locked", branch.isLocked);
+
             if (GUILayout.Button("Add leaf"))
             {
-                branch.SetupLeaf(branch.position, branch.price, branch.isLocked);
+                branch.SetupLeaf(branch.position, branch.price, branch.isLocked, Globals.nbBranches);
                 branch.AddLeaf();
             }
 

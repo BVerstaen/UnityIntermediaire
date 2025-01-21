@@ -5,10 +5,10 @@ namespace GabinBaptisteEnguerrandProject.Prefabs.SkillTree.V2
 {
     public class Branch : MonoBehaviour
     {
-        private List<Leaves> _leaves; //toutes les feuilles de la branche
-        private List<Leaves> _instantiatedleaves; //toutes les feuilles de la branche
-        [SerializeField] private GameObject LeafPrefab;
-        [SerializeField] private Leaves _leaf;
+        public List<Leaves> _leaves; //toutes les feuilles de la branche
+        public List<Leaves> _instantiatedleaves; //toutes les feuilles de la branche
+        [SerializeField] public GameObject LeafPrefab;
+        [SerializeField] public Leaves _leaf;
 
         public Vector2 position;
         public int price; //prix pour unlock
@@ -30,16 +30,17 @@ namespace GabinBaptisteEnguerrandProject.Prefabs.SkillTree.V2
             _instantiatedleaves.Add(Instantiate(_leaf, _leaf.transform.position, Quaternion.identity));
         }
 
-        public void SetupLeaf(Vector2 position, int price, bool isLocked)
+        public void SetupLeaf(Vector2 position, int price, bool isLocked, int nbOfBranch)
         {
             _leaf._position = position;
             _leaf._price = price;
             _leaf._isLocked = isLocked;
-            _leaf._number = 0;
+            _leaf._number = nbOfBranch;
         }
 
         public void AddLeaf(Leaves leaf)
         {
+            leaf._number = _leaf._number + 1;
             _leaves.Add(leaf);
             _instantiatedleaves.Add(leaf);
             //_instantiatedleaves.Add(Instantiate(leaf, leaf.transform.position, Quaternion.identity));

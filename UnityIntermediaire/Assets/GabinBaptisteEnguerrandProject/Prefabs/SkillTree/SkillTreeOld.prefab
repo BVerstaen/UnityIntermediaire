@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3320696776156181610}
   - component: {fileID: 7149146456461034571}
   m_Layer: 0
-  m_Name: SkillTree
+  m_Name: SkillTreeOld
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
