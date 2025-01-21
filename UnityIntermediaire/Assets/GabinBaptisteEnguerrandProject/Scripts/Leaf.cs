@@ -12,7 +12,7 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         public bool _isLocked;
         public Vector2 _position;
         public int _number;
-        public Leaf _previousLeaf;
+       // public Leaf _previousLeaf;
 
     }
 
@@ -25,7 +25,7 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         public bool _isLocked { get => _data._isLocked; set => _data._isLocked = value; }
         public Vector2 _position { get => _data._position; set => _data._position = value; }
         public int _number { get => _data._number; set => _data._number = value; }
-        public Leaf _previousLeaf { get => _data._previousLeaf; set => _data._previousLeaf = value; }
+       // public Leaf _previousLeaf { get => _data._previousLeaf; set => _data._previousLeaf = value; }
 
         public Leaf(Leaf leaf)
         {

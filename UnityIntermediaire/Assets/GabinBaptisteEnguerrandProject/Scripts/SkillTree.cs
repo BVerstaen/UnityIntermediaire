@@ -29,14 +29,15 @@ namespace GabinBaptisteEnguerrandProject.Scripts
         // ReSharper disable Unity.PerformanceAnalysis
         public Leaf AddLeaf(string name, int price, bool isLocked, Vector2 position, int number, Leaf previousLeaf)
         {
+            
             leaf._position = position;
             leaf._number = i++;
             leaf._name = name;
             leaf.name = leaf._name;
             leaf._price = price;
             leaf._isLocked = isLocked;
-            if (leaf._number > 0)
-                leaf._previousLeaf = InstantiateLeaves[leaf._number - 1];
+           // if (leaf._number > 0)
+               // leaf._previousLeaf = InstantiateLeaves[leaf._number - 1];
             _leaves.Add(leaf);
             Debug.Log(_leaves.Count);
             return SpawnTree();
